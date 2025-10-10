@@ -137,4 +137,4 @@ Licence MIT – Libre d'utilisation, modification et distribution.
 
 ---
 
-*Créé  par Abdelhakim Baalla. Connectons les soins de santé, un appel API à la fois ! Si vous aimez, étoilez le repo ⭐ et partagez vos retours.*
+*Créé  par Abdelhakim Baalla Connectons les soins de santé, un appel API à la fois ! Si vous aimez, étoilez le repo ⭐ et partagez vos retours.*
