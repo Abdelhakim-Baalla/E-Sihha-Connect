@@ -1,33 +1,37 @@
-const UtilisateurDepot = require('../repositories/UtilisateurRepository');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const Joi = require('joi');
+const UtilisateurDepot = require("../repositories/UtilisateurRepository");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const Joi = require("joi");
 
 const schemaInscription = Joi.object({
-    courriel: Joi.string().email().required(),
-    motDePasse: Joi.string().min(6).required(),
-    nom: Joi.string().required(),
-    prenom: Joi.string().required(),
-    // Ajoutez d'autres attributs si nécessaire
+  nom: Joi.string().required(),
+  prenom: Joi.string().required(),
+  spécialite: Joi.string().optional(),
+  email: Joi.string().email().required(),
+  motDePasse: Joi.string().min(6).required(),
 });
 
 exports.inscription = async (req, res) => {
-    const { error } = schemaInscription.validate(req.body);
-    if (error) return res.status(400).json(error.details[0].message);
-    const { courriel, motDePasse, nom, prenom } = req.body;
-    const existant = await UtilisateurDepot.findByEmail(courriel);
-    if (existant) return res.status(409).json('Le courriel existe déjà');
-    const utilisateur = await UtilisateurDepot.create({ email: courriel, password: motDePasse, nom, prenom });
-    res.status(201).json('Inscription réussie');
+  const { error } = schemaInscription.validate(req.body);
+  if (error) {
+    return res.status(400).json(error.details[0].message);
+  }
+  try {
+    const { email, motDePasse, nom, prenom, spécialite } = req.body;
+    const existant = await UtilisateurDepot.findByEmail(email);
+    if (existant) return res.status(409).json("Le email existe déjà");
+    const utilisateur = await UtilisateurDepot.create({
+      email: email,
+      password: motDePasse,
+      nom,
+      prenom,
+      specialite: spécialite,
+    });
+    res.status(201).json("Inscription réussie");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erreur serveur: " + err.message);
+  }
 };
 
-exports.connexion = async (req, res) => {
-    const { courriel, motDePasse } = req.body;
-    const utilisateur = await UtilisateurDepot.findByEmail(courriel);
-    if (!utilisateur || !await utilisateur.comparePassword(motDePasse)) return res.status(401).json('Informations incorrectes');
-    const jetonAcces = jwt.sign({ id: utilisateur._id, role: utilisateur.role }, process.env.JWT_SECRET, { expiresIn: '15m' });
-    const jetonRafraichissement = jwt.sign({ id: utilisateur._id }, process.env.REFRESH_SECRET, { expiresIn: '7d' });
-    utilisateur.refreshToken = jetonRafraichissement;
-    await utilisateur.save();
-    res.json({ jetonAcces, jetonRafraichissement });
-};
+
