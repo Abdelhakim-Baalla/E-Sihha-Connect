@@ -6,7 +6,7 @@ const Joi = require("joi");
 const schemaInscription = Joi.object({
   nom: Joi.string().required(),
   prenom: Joi.string().required(),
-  spécialite: Joi.string().optional(),
+  specialite: Joi.string().optional(),
   email: Joi.string().email().required(),
   motDePasse: Joi.string().min(6).required(),
 });
@@ -33,5 +33,3 @@ exports.inscription = async (req, res) => {
     res.status(500).send("Erreur serveur: " + err.message);
   }
 };
-
-
