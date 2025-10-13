@@ -39,7 +39,7 @@ const utilisateurSchema = new mongoose.Schema({
   preferences: {
     type: mongoose.Schema.Types.Mixed,
   },
-  resetToken: {
+  accessToken: {
     type: String,
   },
   refreshToken: {
