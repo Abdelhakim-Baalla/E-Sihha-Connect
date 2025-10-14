@@ -33,3 +33,38 @@ exports.inscription = async (req, res) => {
     res.status(500).send("Erreur serveur: " + err.message);
   }
 };
+
+exports.connexion = async (req, res) => {
+  const { email, motDePasse } = req.body;
+  const utilisateur = await UtilisateurDepot.findByEmail(email);
+  if (!utilisateur) {
+    return res.status(401).json("Informations incorrectes");
+  }
+  const motDePasseValide = await bcrypt.compare(
+    motDePasse,
+    utilisateur.password
+  );
+  if (!motDePasseValide) {
+    return res.status(401).json("Informations incorrectes");
+  }
+  if (!utilisateur.active) {
+    return res.status(403).json("Compte inactif");
+  }
+
+  const jetonAcces = jwt.sign(
+    { id: utilisateur._id, role: utilisateur.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "15m" }
+  );
+  const jetonRafraichissement = jwt.sign(
+    { id: utilisateur._id },
+    process.env.REFRESH_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  utilisateur.refreshToken = jetonRafraichissement;
+  utilisateur.accessToken = jetonAcces;
+  await utilisateur.save();
+
+  res.json({ jetonAcces, jetonRafraichissement });
+};
