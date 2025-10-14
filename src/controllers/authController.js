@@ -2,6 +2,8 @@ const UtilisateurDepot = require("../repositories/UtilisateurRepository");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Joi = require("joi");
+const crypto = require("crypto");
+const emailSen = require("../utils/EnvoyerEmail");
 
 const schemaInscription = Joi.object({
   nom: Joi.string().required(),
@@ -67,4 +69,18 @@ exports.connexion = async (req, res) => {
   await utilisateur.save();
 
   res.json({ jetonAcces, jetonRafraichissement });
+};
+
+exports.forgetPassword = async (req, res) => {
+  const { email } = req.body;
+  const user = await UtilisateurDepot.findByEmail(email);
+  if (!user) return res.status(404).json("المستخدم غير موجود");
+
+  const resetToken = crypto.randomBytes(20).toString("hex");
+  user.resetToken = resetToken;
+  user.resetTokenExpiry = Date.now() + 3600000;
+  await user.save();
+
+  emailSen.envoyerEmail(user, resetToken);
+  res.status(200).json('Email Envoyer avec success!!');
 };
