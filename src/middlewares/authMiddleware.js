@@ -5,7 +5,7 @@ exports.verifyToken = (req, res, next) => {
   if (!token) return res.status(401).json("Le token est manquant");
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    req.utilisateur = decoded;
     next();
   } catch (err) {
     res.status(401).json("Le token est invalide ou a expiré");
