@@ -1,4 +1,4 @@
-const Utilisateur = require('../models/Utilisateur');
+const Utilisateur = require("../models/Utilisateur");
 
 class UtilisateurRepository {
   async create(dataUtilisateur) {
@@ -24,6 +24,17 @@ class UtilisateurRepository {
 
   async reactivate(id) {
     return await this.update(id, { active: true });
+  }
+
+  async findOne(query) {
+    return await Utilisateur.findOne(query);
+  }
+
+  async findByResetToken(resetToken) {
+    return await Utilisateur.findOne({
+      resetToken,
+      resetTokenExpiry: { $gt: Date.now() },
+    });
   }
 }
 
