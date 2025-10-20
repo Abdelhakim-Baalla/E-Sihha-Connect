@@ -46,3 +46,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZWQ0NWM0Y
   "motDePasse": "password123",
   "role": "medecin"
 }
+
+### Suspendre un utilisateur
+PUT http://localhost:3000/api/v1/utilisateurs/{{userId}}/suspend
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+### Réactiver un utilisateur
+PUT http://localhost:3000/api/v1/utilisateurs/{{userId}}/reactive
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
