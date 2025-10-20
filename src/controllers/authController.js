@@ -65,7 +65,7 @@ exports.createUserWithRole = async (req, res) => {
     const roleDoc = await Role.findOne({ nom: role });
     if (!roleDoc) return res.status(400).json("Rôle invalide");
 
-    const utilisateur = await UtilisateurDepot.create({
+    let utilisateur = await UtilisateurDepot.create({
       email: email,
       password: motDePasse,
       nom,
@@ -74,6 +74,18 @@ exports.createUserWithRole = async (req, res) => {
       role: roleDoc._id,
       active: true,
     });
+
+    if (role === "patient") {
+      const Patient = require("../models/Patient");
+      const dossierPatient = await Patient.create({
+        utilisateur: utilisateur._id,
+        nom,
+        prenom,
+        email,
+      });
+      utilisateur.patient = dossierPatient._id;
+      await utilisateur.save();
+    }
 
     res
       .status(201)
