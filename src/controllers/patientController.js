@@ -28,7 +28,7 @@ exports.createPatient = async (req, res) => {
 
 exports.getPatients = async (req, res) => {
   try {
-    const patients = await PatientRepository.findAll();
+    const patients = await PatientRepository.findAll(req.query);
     res.json(patients);
   } catch (err) {
     res.status(500).json({ error: err.message });
