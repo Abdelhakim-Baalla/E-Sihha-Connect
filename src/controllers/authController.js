@@ -6,6 +6,28 @@ const crypto = require("crypto");
 const emailSen = require("../utils/EnvoyerEmail");
 const Role = require("../models/Role");
 
+exports.suspendUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const utilisateur = await UtilisateurDepot.suspend(id);
+    if (!utilisateur) return res.status(404).json("Utilisateur non trouvé");
+    res.json({ message: "Utilisateur suspendu", utilisateur });
+  } catch (err) {
+    res.status(500).json("Erreur lors de la suspension : " + err.message);
+  }
+};
+
+exports.reactivateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const utilisateur = await UtilisateurDepot.reactivate(id);
+    if (!utilisateur) return res.status(404).json("Utilisateur non trouvé");
+    res.json({ message: "Utilisateur réactivé", utilisateur });
+  } catch (err) {
+    res.status(500).json("Erreur lors de la réactivation : " + err.message);
+  }
+};
+
 const schemaCreateUserWithRole = Joi.object({
   nom: Joi.string().required(),
   prenom: Joi.string().required(),
@@ -16,13 +38,15 @@ const schemaCreateUserWithRole = Joi.object({
 });
 
 exports.createUserWithRole = async (req, res) => {
-
   if (!req.utilisateur || !req.utilisateur.role) {
     return res.status(403).json("Accès refusé : rôle manquant");
   }
 
   const adminRole = await Role.findById(req.utilisateur.role);
-  if (!adminRole || (adminRole.nom !== "admin" && adminRole.nom !== "superadmin")) {
+  if (
+    !adminRole ||
+    (adminRole.nom !== "admin" && adminRole.nom !== "superadmin")
+  ) {
     return res
       .status(403)
       .json("Accès refusé : seul un administrateur peut créer des comptes");
