@@ -22,7 +22,7 @@ exports.createUserWithRole = async (req, res) => {
   }
 
   const adminRole = await Role.findById(req.utilisateur.role);
-  if (!adminRole || adminRole.nom !== "admin") {
+  if (!adminRole || (adminRole.nom !== "admin" && adminRole.nom !== "superadmin")) {
     return res
       .status(403)
       .json("Accès refusé : seul un administrateur peut créer des comptes");
@@ -50,7 +50,7 @@ exports.createUserWithRole = async (req, res) => {
       role: roleDoc._id,
       active: true,
     });
-    
+
     res
       .status(201)
       .json({ message: "Utilisateur créé avec succès", utilisateur });

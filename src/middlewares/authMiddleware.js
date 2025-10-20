@@ -6,7 +6,7 @@ exports.isAdmin = async (req, res, next) => {
       return res.status(403).json("Accès refusé : rôle manquant");
     }
     const role = await Role.findById(req.utilisateur.role);
-    if (!role || role.nom !== "admin") {
+    if (!role || (role.nom !== "admin" && role.nom !== "superadmin")) {
       return res
         .status(403)
         .json(
