@@ -46,7 +46,17 @@ exports.getPatientById = async (req, res) => {
 };
 
 exports.updatePatient = async (req, res) => {
-  const { error } = patientSchema.validate(req.body);
+  const updateSchema = Joi.object({
+    nom: Joi.string().optional(),
+    prenom: Joi.string().optional(),
+    date_naissance: Joi.date().optional(),
+    sexe: Joi.string().valid("Homme", "Femme").optional(),
+    email: Joi.string().email().optional(),
+    telephone: Joi.string().optional(),
+    adresse: Joi.string().optional(),
+    allergies: Joi.array().items(Joi.string()).optional(),
+  });
+  const { error } = updateSchema.validate(req.body);
   if (error) {
     return res.status(400).json({ error: error.details[0].message });
   }
