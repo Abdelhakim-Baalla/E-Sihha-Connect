@@ -4,6 +4,61 @@ const jwt = require("jsonwebtoken");
 const Joi = require("joi");
 const crypto = require("crypto");
 const emailSen = require("../utils/EnvoyerEmail");
+const Role = require("../models/Role");
+
+const schemaCreateUserWithRole = Joi.object({
+  nom: Joi.string().required(),
+  prenom: Joi.string().required(),
+  specialite: Joi.string().optional(),
+  email: Joi.string().email().required(),
+  motDePasse: Joi.string().min(6).required(),
+  role: Joi.string().required(),
+});
+
+exports.createUserWithRole = async (req, res) => {
+
+  if (!req.utilisateur || !req.utilisateur.role) {
+    return res.status(403).json("Accès refusé : rôle manquant");
+  }
+
+  const adminRole = await Role.findById(req.utilisateur.role);
+  if (!adminRole || adminRole.nom !== "admin") {
+    return res
+      .status(403)
+      .json("Accès refusé : seul un administrateur peut créer des comptes");
+  }
+
+  const { error } = schemaCreateUserWithRole.validate(req.body);
+  if (error) {
+    return res.status(400).json(error.details[0].message);
+  }
+
+  try {
+    const { email, motDePasse, nom, prenom, specialite, role } = req.body;
+    const existant = await UtilisateurDepot.findByEmail(email);
+    if (existant) return res.status(409).json("Le email existe déjà");
+
+    const roleDoc = await Role.findOne({ nom: role });
+    if (!roleDoc) return res.status(400).json("Rôle invalide");
+
+    const utilisateur = await UtilisateurDepot.create({
+      email: email,
+      password: motDePasse,
+      nom,
+      prenom,
+      specialite,
+      role: roleDoc._id,
+      active: true,
+    });
+    
+    res
+      .status(201)
+      .json({ message: "Utilisateur créé avec succès", utilisateur });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erreur serveur: " + err.message);
+  }
+};
 
 const schemaInscription = Joi.object({
   nom: Joi.string().required(),
