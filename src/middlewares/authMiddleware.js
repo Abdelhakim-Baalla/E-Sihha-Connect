@@ -1,3 +1,26 @@
+const Role = require("../models/Role");
+
+exports.isAdmin = async (req, res, next) => {
+  try {
+    if (!req.utilisateur || !req.utilisateur.role) {
+      return res.status(403).json("Accès refusé : rôle manquant");
+    }
+    const role = await Role.findById(req.utilisateur.role);
+    if (!role || (role.nom !== "admin" && role.nom !== "superadmin")) {
+      return res
+        .status(403)
+        .json(
+          "Accès refusé : seul un administrateur peut effectuer cette action"
+        );
+    }
+    next();
+  } catch (err) {
+    res
+      .status(500)
+      .json("Erreur serveur lors de la vérification du rôle admin");
+  }
+};
+
 const jwt = require("jsonwebtoken");
 
 exports.verifyToken = (req, res, next) => {

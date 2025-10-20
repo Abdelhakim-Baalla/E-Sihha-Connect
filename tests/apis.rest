@@ -1,0 +1,58 @@
+### Inscription
+POST http://localhost:3000/api/v1/inscription
+Content-Type: application/json
+
+{
+  "nom": "Test",
+  "prenom": "User",
+  "email": "testuser@email.com",
+  "motDePasse": "password123"
+}
+
+### Connexion
+POST http://localhost:3000/api/v1/connexion
+Content-Type: application/json
+
+{
+  "email": "abdelhakimbaalla50@gmail.com",
+  "motDePasse": "123456789"
+}
+
+### Mot de passe oublié
+POST http://localhost:3000/api/v1/forget-password
+Content-Type: application/json
+
+{
+  "email": "abdelhakimbaalla50@gmail.com"
+}
+
+### Réinitialisation du mot de passe
+POST http://localhost:3000/api/v1/reset-password/token
+Content-Type: application/json
+
+{
+  "motDePasse": "nouveaumdp123"
+}
+
+### Création d'utilisateur par admin
+POST http://localhost:3000/api/v1/utilisateurs/create
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZWQ0NWM0YmVkYmZlMmRkMDJkMzQwNiIsInJvbGUiOiI2OGVkMzk3NDllNDhjNTc5ODMyMjYzMjciLCJpYXQiOjE3NjA5NTEzNTcsImV4cCI6MTc2MDk1MjI1N30.v3xFIYAigxs8V6CMCimHCqqyJV0X87uegXYW8nwT_4E
+
+{
+  "nom": "Medecin",
+  "prenom": "Test",
+  "email": "medecin2@email.com",
+  "motDePasse": "password123",
+  "role": "medecin"
+}
+
+### Suspendre un utilisateur
+PUT http://localhost:3000/api/v1/utilisateurs/68ee2cc6c0ab57987a0c8f62/suspend
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZWQ0NWM0YmVkYmZlMmRkMDJkMzQwNiIsInJvbGUiOiI2OGVkMzk3NDllNDhjNTc5ODMyMjYzMjciLCJpYXQiOjE3NjA5NTEzNTcsImV4cCI6MTc2MDk1MjI1N30.v3xFIYAigxs8V6CMCimHCqqyJV0X87uegXYW8nwT_4E
+
+### Réactiver un utilisateur
+PUT http://localhost:3000/api/v1/utilisateurs/68ee2cc6c0ab57987a0c8f62/reactive
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZWQ0NWM0YmVkYmZlMmRkMDJkMzQwNiIsInJvbGUiOiI2OGVkMzk3NDllNDhjNTc5ODMyMjYzMjciLCJpYXQiOjE3NjA5NTEzNTcsImV4cCI6MTc2MDk1MjI1N30.v3xFIYAigxs8V6CMCimHCqqyJV0X87uegXYW8nwT_4E
