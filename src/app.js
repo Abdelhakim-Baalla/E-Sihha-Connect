@@ -5,6 +5,8 @@ const patientRoutes = require("./routes/patientRoutes");
 const connectDB = require("./config/db");
 const { seedRoles } = require("./seeders/roleSeeder");
 const { seedUtilisateurs } = require("./seeders/utilisateurSeeder");
+require("./models/Allergie");
+require("./models/MedicalHistorique");
 
 dotenv.config();
 
