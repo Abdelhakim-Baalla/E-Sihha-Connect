@@ -34,3 +34,12 @@ exports.verifyToken = (req, res, next) => {
     res.status(401).json("Le token est invalide ou a expiré");
   }
 };
+
+exports.isSelfPatient = (req, res, next) => {
+  if (!req.utilisateur || req.utilisateur.id !== req.params.id) {
+    return res
+      .status(403)
+      .json("Accès refusé : vous ne pouvez modifier que votre propre profil");
+  }
+  next();
+};
