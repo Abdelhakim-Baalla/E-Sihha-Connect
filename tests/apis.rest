@@ -30,6 +30,15 @@ Content-Type: application/json
     "motDePasse": "123456789"
 }
 
+### Connexion comme médecin
+POST http://localhost:3000/api/v1/connexion
+Content-Type: application/json
+
+{
+    "email": "doctor@email.com",
+    "motDePasse": "doctorpassword"
+}
+
 ### Mot de passe oublié
 POST http://localhost:3000/api/v1/forget-password
 Content-Type: application/json
@@ -125,3 +134,9 @@ Authorization: Bearer {{patientToken}}
 {
     "allergies": ["68f73c85b825417607f06a9d", "68f73cc5b825417607f06a9f"]
 }
+
+@doctorToken =
+
+### Consultation dossier patient par médecin
+GET http://localhost:3000/api/v1/patients/{{patientId}}
+Authorization: Bearer {{doctorToken}}
