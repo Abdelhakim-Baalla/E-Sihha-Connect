@@ -1,3 +1,4 @@
+const bookRendezVousRoutes = require("./routes/bookRendezVousRoutes");
 const express = require("express");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/authRoutes");
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use("/api/v1/", authRoutes);
 app.use("/api/v1/patients", patientRoutes);
 app.use("/api/v1/rendezvous", rendezVousRoutes);
+app.use("/api/v1/rendezvous", bookRendezVousRoutes);
 app.use("/api/v1/availability", availabilityRoutes);
 
 app.get("/", (req, res) => {
