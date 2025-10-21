@@ -54,7 +54,12 @@ exports.updatePatient = async (req, res) => {
     email: Joi.string().email().optional(),
     telephone: Joi.string().optional(),
     adresse: Joi.string().optional(),
-    allergies: Joi.array().items(Joi.string()).optional(),
+    allergies: Joi.array()
+      .items(Joi.string().regex(/^[a-fA-F0-9]{24}$/))
+      .optional(),
+    medicalHistoriques: Joi.array()
+      .items(Joi.string().regex(/^[a-fA-F0-9]{24}$/))
+      .optional(),
   });
   const { error } = updateSchema.validate(req.body);
   if (error) {
