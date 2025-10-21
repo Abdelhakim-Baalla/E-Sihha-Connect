@@ -7,6 +7,8 @@ const { seedRoles } = require("./seeders/roleSeeder");
 const { seedUtilisateurs } = require("./seeders/utilisateurSeeder");
 require("./models/Allergie");
 require("./models/MedicalHistorique");
+require("./models/Utilisateur");
+require("./models/Patient");
 
 dotenv.config();
 

@@ -1,5 +1,6 @@
-@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZWQ0NWM0YmVkYmZlMmRkMDJkMzQwNiIsInJvbGUiOiI2OGVkMzk3NDllNDhjNTc5ODMyMjYzMjciLCJpYXQiOjE3NjA5NTYxMjgsImV4cCI6MTc2MDk1NzAyOH0.b-ekl7vD7jFpvJGJPs1u11PIBIbb8UznRI-Vjz1cpmY
-@patientId = 68f60fcd0cca05382a89f143
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZWQ0NWM0YmVkYmZlMmRkMDJkMzQwNiIsInJvbGUiOiI2OGVkMzk3NDllNDhjNTc5ODMyMjYzMjciLCJpYXQiOjE3NjA5Njc3NTQsImV4cCI6MTc2MDk2ODY1NH0.JhS_iOwvpi0_pfJaKg6W0YhB85_5fFQsSuEX05mAJq8
+@patientId = 68f63f7ee3de5b5a7cb2a515
+@patientToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjYzZjdlZTNkZTViNWE3Y2IyYTUxMyIsInJvbGUiOiI2OGVkMzkxNTZhYTBkM2MxMGQxZjU2Y2EiLCJpYXQiOjE3NjEwMzMyMTksImV4cCI6MTc2MTAzNDExOX0.5A6Pv5DJyxnWOd6QHuEg_9zWKByoMN3epNlURIZgKjc
 ### Inscription
 POST http://localhost:3000/api/v1/inscription
 Content-Type: application/json
@@ -11,12 +12,21 @@ Content-Type: application/json
     "motDePasse": "password123"
 }
 
-### Connexion
+### Connexion comme admin
 POST http://localhost:3000/api/v1/connexion
 Content-Type: application/json
 
 {
     "email": "abdelhakimbaalla50@gmail.com",
+    "motDePasse": "123456789"
+}
+
+### Connexion comme patient
+POST http://localhost:3000/api/v1/connexion
+Content-Type: application/json
+
+{
+    "email": "patient3@email.com",
     "motDePasse": "123456789"
 }
 
@@ -44,8 +54,8 @@ Authorization: Bearer {{adminToken}}
 {
     "nom": "Patient",
     "prenom": "Test",
-    "email": "patient@email.com",
-    "motDePasse": "password123",
+    "email": "patient3@email.com",
+    "motDePasse": "123456789",
     "role": "patient"
 }
 
@@ -76,7 +86,7 @@ GET http://localhost:3000/api/v1/patients
 Authorization: Bearer {{adminToken}}
 
 ### Recherche patient par nom
-GET http://localhost:3000/api/v1/patients?nom=Ali
+GET http://localhost:3000/api/v1/patients?nom=Patient
 Authorization: Bearer {{adminToken}}
 
 ### Récupérer un patient par ID
@@ -96,3 +106,22 @@ Authorization: Bearer {{adminToken}}
 ### Supprimer un patient
 DELETE http://localhost:3000/api/v1/patients/{{patientId}}
 Authorization: Bearer {{adminToken}}
+
+### Mise à jour du profil patient (coordonnées)
+PUT http://localhost:3000/api/v1/patients/{{patientId}}/update
+Content-Type: application/json
+Authorization: Bearer {{patientToken}}
+
+{
+    "telephone": "0600000001",
+    "adresse": "Casablanca, Maroc"
+}
+
+### Mise à jour des allergies du patient
+PUT http://localhost:3000/api/v1/patients/{{patientId}}/update
+Content-Type: application/json
+Authorization: Bearer {{patientToken}}
+
+{
+    "allergies": ["68f73c85b825417607f06a9d", "68f73cc5b825417607f06a9f"]
+}

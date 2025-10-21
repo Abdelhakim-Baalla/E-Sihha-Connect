@@ -34,3 +34,24 @@ exports.verifyToken = (req, res, next) => {
     res.status(401).json("Le token est invalide ou a expiré");
   }
 };
+
+const Patient = require("../models/Patient");
+exports.isSelfPatient = async (req, res, next) => {
+  try {
+    if (!req.utilisateur) {
+      return res.status(403).json("Accès refusé : utilisateur non authentifié");
+    }
+    const patient = await Patient.findById(req.params.id);
+    if (!patient) {
+      return res.status(404).json("Patient non trouvé");
+    }
+    if (patient.utilisateur.toString() !== req.utilisateur.id) {
+      return res
+        .status(403)
+        .json("Accès refusé : vous ne pouvez modifier que votre propre profil");
+    }
+    next();
+  } catch (err) {
+    res.status(500).json("Erreur lors de la vérification du patient");
+  }
+};
