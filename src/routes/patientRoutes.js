@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post("/", verifyToken, isAdmin, patientController.createPatient);
 router.get("/", verifyToken, isAdmin, patientController.getPatients);
-router.get("/:id", verifyToken, isSelfPatient, isAdmin, isDoctor, patientController.getPatientById);
+router.get("/:id", verifyToken, isDoctor, patientController.getPatientById);
 router.put("/:id", verifyToken, isAdmin, patientController.updatePatient);
 router.put("/:id/update",verifyToken,isSelfPatient,patientController.updatePatient);
 router.delete("/:id", verifyToken, isAdmin, patientController.deletePatient);

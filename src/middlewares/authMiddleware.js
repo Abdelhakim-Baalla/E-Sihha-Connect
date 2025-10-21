@@ -8,7 +8,7 @@ exports.isDoctor = async (req, res, next) => {
       return res.status(403).json("Accès refusé : rôle manquant");
     }
     const role = await Role.findById(req.utilisateur.role);
-    if (!role || role.nom !== "doctor") {
+    if (!role || role.nom !== "medecin") {
       return res
         .status(403)
         .json("Accès refusé : seul un médecin peut consulter ce dossier");
