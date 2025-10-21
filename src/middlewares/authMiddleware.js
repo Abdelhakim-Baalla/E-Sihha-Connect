@@ -1,4 +1,26 @@
 const Role = require("../models/Role");
+const jwt = require("jsonwebtoken");
+const Patient = require("../models/Patient");
+
+exports.isDoctor = async (req, res, next) => {
+  try {
+    if (!req.utilisateur || !req.utilisateur.role) {
+      return res.status(403).json("Accès refusé : rôle manquant");
+    }
+    const role = await Role.findById(req.utilisateur.role);
+    if (!role || role.nom !== "medecin") {
+      return res
+        .status(403)
+        .json("Accès refusé : seul un médecin peut consulter ce dossier");
+    }
+    next();
+  } catch (err) {
+    res
+      .status(500)
+      .json("Erreur serveur lors de la vérification du rôle doctor");
+  }
+};
+
 
 exports.isAdmin = async (req, res, next) => {
   try {
@@ -21,8 +43,6 @@ exports.isAdmin = async (req, res, next) => {
   }
 };
 
-const jwt = require("jsonwebtoken");
-
 exports.verifyToken = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json("Le token est manquant");
@@ -32,5 +52,25 @@ exports.verifyToken = (req, res, next) => {
     next();
   } catch (err) {
     res.status(401).json("Le token est invalide ou a expiré");
+  }
+};
+
+exports.isSelfPatient = async (req, res, next) => {
+  try {
+    if (!req.utilisateur) {
+      return res.status(403).json("Accès refusé : utilisateur non authentifié");
+    }
+    const patient = await Patient.findById(req.params.id);
+    if (!patient) {
+      return res.status(404).json("Patient non trouvé");
+    }
+    if (patient.utilisateur.toString() !== req.utilisateur.id) {
+      return res
+        .status(403)
+        .json("Accès refusé : vous ne pouvez modifier que votre propre profil");
+    }
+    next();
+  } catch (err) {
+    res.status(500).json("Erreur lors de la vérification du patient");
   }
 };

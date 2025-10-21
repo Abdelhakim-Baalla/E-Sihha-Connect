@@ -39,6 +39,11 @@ const utilisateurSchema = new mongoose.Schema({
   preferences: {
     type: mongoose.Schema.Types.Mixed,
   },
+  patient: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Patient",
+    default: null,
+  },
   accessToken: {
     type: String,
   },

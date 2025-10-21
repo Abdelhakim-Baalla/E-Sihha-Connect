@@ -62,10 +62,20 @@ exports.createUserWithRole = async (req, res) => {
     const existant = await UtilisateurDepot.findByEmail(email);
     if (existant) return res.status(409).json("Le email existe déjà");
 
-    const roleDoc = await Role.findOne({ nom: role });
-    if (!roleDoc) return res.status(400).json("Rôle invalide");
+    let roleToAssign = role;
+    let roleDoc = null;
+    if (!roleToAssign) {
+      roleDoc = await Role.findOne({ nom: "patient" });
+      if (!roleDoc) {
+        roleDoc = await Role.create({ nom: "patient" });
+      }
+      roleToAssign = "patient";
+    } else {
+      roleDoc = await Role.findOne({ nom: roleToAssign });
+      if (!roleDoc) return res.status(400).json("Rôle invalide");
+    }
 
-    const utilisateur = await UtilisateurDepot.create({
+    let utilisateur = await UtilisateurDepot.create({
       email: email,
       password: motDePasse,
       nom,
@@ -74,6 +84,18 @@ exports.createUserWithRole = async (req, res) => {
       role: roleDoc._id,
       active: true,
     });
+
+    if (!role || roleToAssign === "patient") {
+      const Patient = require("../models/Patient");
+      const dossierPatient = await Patient.create({
+        utilisateur: utilisateur._id,
+        nom,
+        prenom,
+        email,
+      });
+      utilisateur.patient = dossierPatient._id;
+      await utilisateur.save();
+    }
 
     res
       .status(201)
@@ -106,17 +128,38 @@ exports.inscription = async (req, res) => {
     return res.status(400).json(error.details[0].message);
   }
   try {
-    const { email, motDePasse, nom, prenom, spécialite } = req.body;
+    const { email, motDePasse, nom, prenom, specialite } = req.body;
     const existant = await UtilisateurDepot.findByEmail(email);
     if (existant) return res.status(409).json("Le email existe déjà");
+
+    let rolePatient = await Role.findOne({ nom: "patient" });
+    if (!rolePatient) {
+      rolePatient = await Role.create({ nom: "patient" });
+    }
+
     const utilisateur = await UtilisateurDepot.create({
       email: email,
       password: motDePasse,
       nom,
       prenom,
-      specialite: spécialite,
+      specialite: specialite,
+      role: rolePatient._id,
+      active: true,
     });
-    res.status(201).json("Inscription réussie");
+
+    const Patient = require("../models/Patient");
+    const patient = await Patient.create({
+      utilisateur: utilisateur._id,
+      nom,
+      prenom,
+      email,
+    });
+    utilisateur.patient = patient._id;
+    await utilisateur.save();
+
+    res
+      .status(201)
+      .json({ message: "Inscription réussie", utilisateur, patient });
   } catch (err) {
     console.error(err);
     res.status(500).send("Erreur serveur: " + err.message);
