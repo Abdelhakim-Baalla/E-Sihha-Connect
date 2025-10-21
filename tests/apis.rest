@@ -140,3 +140,43 @@ Authorization: Bearer {{patientToken}}
 ### Consultation dossier patient par médecin
 GET http://localhost:3000/api/v1/patients/{{patientId}}
 Authorization: Bearer {{doctorToken}}
+
+### Création d'un rendez-vous par médecin
+POST http://localhost:3000/api/v1/rendezvous/create
+Content-Type: application/json
+Authorization: Bearer {{doctorToken}}
+
+{
+    "date": "{{$isoTimestamp}}",
+    "duree": 30,
+    "patient": "{{patientId}}"
+}
+
+### Réservation d'un rendez-vous par patient
+POST http://localhost:3000/api/v1/rendezvous/book
+Content-Type: application/json
+Authorization: Bearer {{patientToken}}
+
+{
+    "date": "2025-10-22T11:00:00.000Z",
+    "duree": 30,
+    "medecin": ""
+}
+
+### Modification d'un rendez-vous par le médecin
+PUT http://localhost:3000/api/v1/rendezvous/idrendezvous/update
+Content-Type: application/json
+Authorization: Bearer {{doctorToken}}
+
+{
+    "date": "2025-10-22T12:00:00.000Z",
+    "duree": 45
+}
+
+### Annulation d'un rendez-vous par le médecin
+DELETE http://localhost:3000/api/v1/rendezvous/idrendezvous
+Authorization: Bearer {{doctorToken}}
+
+### Vérification des conflits par secrétaire
+GET http://localhost:3000/api/v1/rendezvous/check-conflicts?date=2025-10-22T11:00:00.000Z&duree=30&medecin=doctorId
+Authorization: Bearer secretaireToken

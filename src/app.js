@@ -1,7 +1,10 @@
+const bookRendezVousRoutes = require("./routes/bookRendezVousRoutes");
 const express = require("express");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/authRoutes");
 const patientRoutes = require("./routes/patientRoutes");
+const rendezVousRoutes = require("./routes/rendezVousRoutes");
+const availabilityRoutes = require("./routes/availabilityRoutes");
 const connectDB = require("./config/db");
 const { seedRoles } = require("./seeders/roleSeeder");
 const { seedUtilisateurs } = require("./seeders/utilisateurSeeder");
@@ -9,6 +12,7 @@ require("./models/Allergie");
 require("./models/MedicalHistorique");
 require("./models/Utilisateur");
 require("./models/Patient");
+require("./models/RendezVous");
 
 dotenv.config();
 
@@ -17,6 +21,9 @@ app.use(express.json());
 
 app.use("/api/v1/", authRoutes);
 app.use("/api/v1/patients", patientRoutes);
+app.use("/api/v1/rendezvous", rendezVousRoutes);
+app.use("/api/v1/rendezvous", bookRendezVousRoutes);
+app.use("/api/v1/availability", availabilityRoutes);
 
 app.get("/", (req, res) => {
   res.send("Bienvenue sur E-Sihha Connect API");
