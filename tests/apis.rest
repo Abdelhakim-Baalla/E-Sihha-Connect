@@ -140,3 +140,14 @@ Authorization: Bearer {{patientToken}}
 ### Consultation dossier patient par médecin
 GET http://localhost:3000/api/v1/patients/{{patientId}}
 Authorization: Bearer {{doctorToken}}
+
+### Création d'un rendez-vous par médecin
+POST http://localhost:3000/api/v1/rendezvous/create
+Content-Type: application/json
+Authorization: Bearer {{doctorToken}}
+
+{
+    "date": "{{$isoTimestamp}}",
+    "duree": 30,
+    "patient": "{{patientId}}"
+}
