@@ -151,3 +151,14 @@ Authorization: Bearer {{doctorToken}}
     "duree": 30,
     "patient": "{{patientId}}"
 }
+
+### Réservation d'un rendez-vous par patient
+POST http://localhost:3000/api/v1/rendezvous/book
+Content-Type: application/json
+Authorization: Bearer {{patientToken}}
+
+{
+    "date": "2025-10-22T11:00:00.000Z",
+    "duree": 30,
+    "medecin": ""
+}
