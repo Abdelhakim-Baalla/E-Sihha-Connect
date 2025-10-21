@@ -21,7 +21,7 @@ exports.createRendezVous = async (req, res) => {
   }
   try {
     const { date, duree, patient } = req.body;
-    const conflits = await RendezVousRepository.findConflicts(
+    const conflits = await RendezVousRepository.checkConflicts(
       date,
       duree,
       medecinId
@@ -29,6 +29,7 @@ exports.createRendezVous = async (req, res) => {
     if (conflits.length > 0) {
       return res.status(409).json({
         error: "Conflit : un rendez-vous existe déjà pour ce créneau.",
+        conflits,
       });
     }
     const rendezVous = await RendezVousRepository.create({
@@ -56,22 +57,18 @@ exports.updateRendezVous = async (req, res) => {
     if (req.body.date || req.body.duree) {
       const date = req.body.date || rdv.date;
       const duree = req.body.duree || rdv.duree;
-      const conflits = await RendezVousRepository.findConflicts(
+      const conflits = await RendezVousRepository.checkConflicts(
         date,
         duree,
-        rdv.medecin
+        rdv.medecin,
+        rdv._id
       );
-      
-      const conflitsFiltres = conflits.filter(
-        (c) => c._id.toString() !== rdv._id.toString()
-      );
-      if (conflitsFiltres.length > 0) {
+      if (conflits.length > 0) {
         return res
           .status(409)
-          .json({ error: "Conflit : ce créneau est déjà réservé." });
+          .json({ error: "Conflit : ce créneau est déjà réservé.", conflits });
       }
     }
-    
     Object.assign(rdv, req.body);
     await rdv.save();
     res.json(rdv);
@@ -89,5 +86,30 @@ exports.deleteRendezVous = async (req, res) => {
     res.json({ message: "Rendez-vous annulé" });
   } catch (err) {
     res.status(400).json({ error: err.message });
+  }
+};
+
+exports.checkConflicts = async (req, res) => {
+  const schema = Joi.object({
+    date: Joi.date().required(),
+    duree: Joi.number().min(1).max(480).required(),
+    medecin: Joi.string().required(),
+    excludeId: Joi.string().optional(),
+  });
+  const { error } = schema.validate(req.query);
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+  try {
+    const { date, duree, medecin, excludeId } = req.query;
+    const conflits = await RendezVousRepository.checkConflicts(
+      date,
+      duree,
+      medecin,
+      excludeId
+    );
+    res.json({ conflits });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };

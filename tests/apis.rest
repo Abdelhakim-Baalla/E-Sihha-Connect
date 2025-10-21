@@ -176,3 +176,7 @@ Authorization: Bearer {{doctorToken}}
 ### Annulation d'un rendez-vous par le médecin
 DELETE http://localhost:3000/api/v1/rendezvous/idrendezvous
 Authorization: Bearer {{doctorToken}}
+
+### Vérification des conflits par secrétaire
+GET http://localhost:3000/api/v1/rendezvous/check-conflicts?date=2025-10-22T11:00:00.000Z&duree=30&medecin=doctorId
+Authorization: Bearer secretaireToken

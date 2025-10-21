@@ -7,5 +7,6 @@ const router = express.Router();
 router.post("/create", verifyToken, isDoctor, rendezVousController.createRendezVous);
 router.put("/:id/update", verifyToken, isDoctor, rendezVousController.updateRendezVous);
 router.delete("/:id", verifyToken, isDoctor, rendezVousController.deleteRendezVous);
+router.get("/check-conflicts", verifyToken, rendezVousController.checkConflicts);
 
 module.exports = router;
