@@ -1,0 +1,209 @@
+{
+  "info": {
+    "_postman_id": "e-sihha-connect-collection-002",
+    "name": "E-Sihha-Connect API (Complète)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection complète pour tester tous les endpoints de l'API E-Sihha-Connect."
+  },
+  "item": [
+    {
+      "name": "Authentification",
+      "item": [
+        {
+          "name": "Inscription",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"motdepasse\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/inscription", "host": ["{{base_url}}"], "path": ["api", "v1", "inscription"] }
+          }
+        },
+        {
+          "name": "Connexion",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"motdepasse\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/connexion", "host": ["{{base_url}}"], "path": ["api", "v1", "connexion"] }
+          }
+        },
+        {
+          "name": "Mot de passe oublié",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"test@example.com\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/forget-password", "host": ["{{base_url}}"], "path": ["api", "v1", "forget-password"] }
+          }
+        },
+        {
+          "name": "Reset mot de passe",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"password\": \"nouveauMotDePasse\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/reset-password/{{token}}", "host": ["{{base_url}}"], "path": ["api", "v1", "reset-password", "{{token}}"] }
+          }
+        },
+        {
+          "name": "Créer utilisateur (admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"motdepasse\",\n  \"role\": \"medecin\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/utilisateurs/create", "host": ["{{base_url}}"], "path": ["api", "v1", "utilisateurs", "create"] }
+          }
+        },
+        {
+          "name": "Suspendre utilisateur (admin)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/api/v1/utilisateurs/{{userId}}/suspend", "host": ["{{base_url}}"], "path": ["api", "v1", "utilisateurs", "{{userId}}", "suspend"] }
+          }
+        },
+        {
+          "name": "Réactiver utilisateur (admin)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/api/v1/utilisateurs/{{userId}}/reactive", "host": ["{{base_url}}"], "path": ["api", "v1", "utilisateurs", "{{userId}}", "reactive"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Patients",
+      "item": [
+        {
+          "name": "Créer un patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Doe\",\n  \"prenom\": \"John\",\n  \"dateNaissance\": \"1990-01-01\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/patients", "host": ["{{base_url}}"], "path": ["api", "v1", "patients"] }
+          }
+        },
+        {
+          "name": "Lister les patients",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/api/v1/patients", "host": ["{{base_url}}"], "path": ["api", "v1", "patients"] }
+          }
+        },
+        {
+          "name": "Détail patient",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/api/v1/patients/{{patientId}}", "host": ["{{base_url}}"], "path": ["api", "v1", "patients", "{{patientId}}"] }
+          }
+        },
+        {
+          "name": "Modifier patient (admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Doe\",\n  \"prenom\": \"John\",\n  \"dateNaissance\": \"1990-01-01\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/patients/{{patientId}}", "host": ["{{base_url}}"], "path": ["api", "v1", "patients", "{{patientId}}"] }
+          }
+        },
+        {
+          "name": "Modifier ses infos (patient)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Doe\",\n  \"prenom\": \"John\",\n  \"dateNaissance\": \"1990-01-01\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/patients/{{patientId}}/update", "host": ["{{base_url}}"], "path": ["api", "v1", "patients", "{{patientId}}", "update"] }
+          }
+        },
+        {
+          "name": "Supprimer patient (admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/api/v1/patients/{{patientId}}", "host": ["{{base_url}}"], "path": ["api", "v1", "patients", "{{patientId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rendez-vous",
+      "item": [
+        {
+          "name": "Créer un rendez-vous",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"patientId\": \"<id_patient>\",\n  \"date\": \"2025-12-01T10:00:00Z\",\n  \"duree\": 30\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/rendezvous/create", "host": ["{{base_url}}"], "path": ["api", "v1", "rendezvous", "create"] }
+          }
+        },
+        {
+          "name": "Modifier rendez-vous",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"date\": \"2025-12-01T11:00:00Z\",\n  \"duree\": 45\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/rendezvous/{{rendezVousId}}/update", "host": ["{{base_url}}"], "path": ["api", "v1", "rendezvous", "{{rendezVousId}}", "update"] }
+          }
+        },
+        {
+          "name": "Supprimer rendez-vous",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/api/v1/rendezvous/{{rendezVousId}}", "host": ["{{base_url}}"], "path": ["api", "v1", "rendezvous", "{{rendezVousId}}"] }
+          }
+        },
+        {
+          "name": "Vérifier les conflits",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/api/v1/rendezvous/check-conflicts?date=2025-12-01T10:00:00Z&medecinId=<id_medecin>", "host": ["{{base_url}}"], "path": ["api", "v1", "rendezvous", "check-conflicts"], "query": [ { "key": "date", "value": "2025-12-01T10:00:00Z" }, { "key": "medecinId", "value": "<id_medecin>" } ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Disponibilité",
+      "item": [
+        {
+          "name": "GET disponibilité médecin",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/api/v1/availability?doctorId=<id_medecin>&date=2025-12-01", "host": ["{{base_url}}"], "path": ["api", "v1", "availability"], "query": [ { "key": "doctorId", "value": "<id_medecin>" }, { "key": "date", "value": "2025-12-01" } ] }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "patientId", "value": "" },
+    { "key": "rendezVousId", "value": "" }
+  ]
+}

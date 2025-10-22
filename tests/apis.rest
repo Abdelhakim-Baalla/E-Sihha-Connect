@@ -1,0 +1,182 @@
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZWQ0NWM0YmVkYmZlMmRkMDJkMzQwNiIsInJvbGUiOiI2OGVkMzk3NDllNDhjNTc5ODMyMjYzMjciLCJpYXQiOjE3NjA5Njc3NTQsImV4cCI6MTc2MDk2ODY1NH0.JhS_iOwvpi0_pfJaKg6W0YhB85_5fFQsSuEX05mAJq8
+@patientId = 68f63f7ee3de5b5a7cb2a515
+@patientToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjYzZjdlZTNkZTViNWE3Y2IyYTUxMyIsInJvbGUiOiI2OGVkMzkxNTZhYTBkM2MxMGQxZjU2Y2EiLCJpYXQiOjE3NjEwMzMyMTksImV4cCI6MTc2MTAzNDExOX0.5A6Pv5DJyxnWOd6QHuEg_9zWKByoMN3epNlURIZgKjc
+### Inscription
+POST http://localhost:3000/api/v1/inscription
+Content-Type: application/json
+
+{
+    "nom": "Test",
+    "prenom": "User",
+    "email": "testuser@email.com",
+    "motDePasse": "password123"
+}
+
+### Connexion comme admin
+POST http://localhost:3000/api/v1/connexion
+Content-Type: application/json
+
+{
+    "email": "abdelhakimbaalla50@gmail.com",
+    "motDePasse": "123456789"
+}
+
+### Connexion comme patient
+POST http://localhost:3000/api/v1/connexion
+Content-Type: application/json
+
+{
+    "email": "patient3@email.com",
+    "motDePasse": "123456789"
+}
+
+### Connexion comme médecin
+POST http://localhost:3000/api/v1/connexion
+Content-Type: application/json
+
+{
+    "email": "doctor@email.com",
+    "motDePasse": "doctorpassword"
+}
+
+### Mot de passe oublié
+POST http://localhost:3000/api/v1/forget-password
+Content-Type: application/json
+
+{
+    "email": "abdelhakimbaalla50@gmail.com"
+}
+
+### Réinitialisation du mot de passe
+POST http://localhost:3000/api/v1/reset-password/token
+Content-Type: application/json
+
+{
+    "motDePasse": "nouveaumdp123"
+}
+
+### Création d'utilisateur par admin
+POST http://localhost:3000/api/v1/utilisateurs/create
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+    "nom": "Patient",
+    "prenom": "Test",
+    "email": "patient3@email.com",
+    "motDePasse": "123456789",
+    "role": "patient"
+}
+
+### Suspendre un utilisateur
+PUT http://localhost:3000/api/v1/utilisateurs/68ee2cc6c0ab57987a0c8f62/suspend
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+### Réactiver un utilisateur
+PUT http://localhost:3000/api/v1/utilisateurs/68ee2cc6c0ab57987a0c8f62/reactive
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+### Création d'un patient
+POST http://localhost:3000/api/v1/patients
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+    "nom": "Ali",
+    "prenom": "Ben",
+    "email": "ali.ben@email.com",
+    "sexe": "Homme"
+}
+
+### Liste des patients
+GET http://localhost:3000/api/v1/patients
+Authorization: Bearer {{adminToken}}
+
+### Recherche patient par nom
+GET http://localhost:3000/api/v1/patients?nom=Patient
+Authorization: Bearer {{adminToken}}
+
+### Récupérer un patient par ID
+GET http://localhost:3000/api/v1/patients/{{patientId}}
+Authorization: Bearer {{adminToken}}
+
+### Modifier un patient
+PUT http://localhost:3000/api/v1/patients/{{patientId}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+    "nom": "AliModif",
+    "prenom": "BenModif"
+}
+
+### Supprimer un patient
+DELETE http://localhost:3000/api/v1/patients/{{patientId}}
+Authorization: Bearer {{adminToken}}
+
+### Mise à jour du profil patient (coordonnées)
+PUT http://localhost:3000/api/v1/patients/{{patientId}}/update
+Content-Type: application/json
+Authorization: Bearer {{patientToken}}
+
+{
+    "telephone": "0600000001",
+    "adresse": "Casablanca, Maroc"
+}
+
+### Mise à jour des allergies du patient
+PUT http://localhost:3000/api/v1/patients/{{patientId}}/update
+Content-Type: application/json
+Authorization: Bearer {{patientToken}}
+
+{
+    "allergies": ["68f73c85b825417607f06a9d", "68f73cc5b825417607f06a9f"]
+}
+
+@doctorToken =
+
+### Consultation dossier patient par médecin
+GET http://localhost:3000/api/v1/patients/{{patientId}}
+Authorization: Bearer {{doctorToken}}
+
+### Création d'un rendez-vous par médecin
+POST http://localhost:3000/api/v1/rendezvous/create
+Content-Type: application/json
+Authorization: Bearer {{doctorToken}}
+
+{
+    "date": "{{$isoTimestamp}}",
+    "duree": 30,
+    "patient": "{{patientId}}"
+}
+
+### Réservation d'un rendez-vous par patient
+POST http://localhost:3000/api/v1/rendezvous/book
+Content-Type: application/json
+Authorization: Bearer {{patientToken}}
+
+{
+    "date": "2025-10-22T11:00:00.000Z",
+    "duree": 30,
+    "medecin": ""
+}
+
+### Modification d'un rendez-vous par le médecin
+PUT http://localhost:3000/api/v1/rendezvous/idrendezvous/update
+Content-Type: application/json
+Authorization: Bearer {{doctorToken}}
+
+{
+    "date": "2025-10-22T12:00:00.000Z",
+    "duree": 45
+}
+
+### Annulation d'un rendez-vous par le médecin
+DELETE http://localhost:3000/api/v1/rendezvous/idrendezvous
+Authorization: Bearer {{doctorToken}}
+
+### Vérification des conflits par secrétaire
+GET http://localhost:3000/api/v1/rendezvous/check-conflicts?date=2025-10-22T11:00:00.000Z&duree=30&medecin=doctorId
+Authorization: Bearer secretaireToken

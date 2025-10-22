@@ -1,0 +1,274 @@
+const UtilisateurDepot = require("../repositories/UtilisateurRepository");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const Joi = require("joi");
+const crypto = require("crypto");
+const emailSen = require("../utils/EnvoyerEmail");
+const Role = require("../models/Role");
+
+exports.suspendUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const utilisateur = await UtilisateurDepot.suspend(id);
+    if (!utilisateur) return res.status(404).json("Utilisateur non trouvé");
+    res.json({ message: "Utilisateur suspendu", utilisateur });
+  } catch (err) {
+    res.status(500).json("Erreur lors de la suspension : " + err.message);
+  }
+};
+
+exports.reactivateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const utilisateur = await UtilisateurDepot.reactivate(id);
+    if (!utilisateur) return res.status(404).json("Utilisateur non trouvé");
+    res.json({ message: "Utilisateur réactivé", utilisateur });
+  } catch (err) {
+    res.status(500).json("Erreur lors de la réactivation : " + err.message);
+  }
+};
+
+const schemaCreateUserWithRole = Joi.object({
+  nom: Joi.string().required(),
+  prenom: Joi.string().required(),
+  specialite: Joi.string().optional(),
+  email: Joi.string().email().required(),
+  motDePasse: Joi.string().min(6).required(),
+  role: Joi.string().required(),
+});
+
+exports.createUserWithRole = async (req, res) => {
+  if (!req.utilisateur || !req.utilisateur.role) {
+    return res.status(403).json("Accès refusé : rôle manquant");
+  }
+
+  const adminRole = await Role.findById(req.utilisateur.role);
+  if (
+    !adminRole ||
+    (adminRole.nom !== "admin" && adminRole.nom !== "superadmin")
+  ) {
+    return res
+      .status(403)
+      .json("Accès refusé : seul un administrateur peut créer des comptes");
+  }
+
+  const { error } = schemaCreateUserWithRole.validate(req.body);
+  if (error) {
+    return res.status(400).json(error.details[0].message);
+  }
+
+  try {
+    const { email, motDePasse, nom, prenom, specialite, role } = req.body;
+    const existant = await UtilisateurDepot.findByEmail(email);
+    if (existant) return res.status(409).json("Le email existe déjà");
+
+    let roleToAssign = role;
+    let roleDoc = null;
+    if (!roleToAssign) {
+      roleDoc = await Role.findOne({ nom: "patient" });
+      if (!roleDoc) {
+        roleDoc = await Role.create({ nom: "patient" });
+      }
+      roleToAssign = "patient";
+    } else {
+      roleDoc = await Role.findOne({ nom: roleToAssign });
+      if (!roleDoc) return res.status(400).json("Rôle invalide");
+    }
+
+    let utilisateur = await UtilisateurDepot.create({
+      email: email,
+      password: motDePasse,
+      nom,
+      prenom,
+      specialite,
+      role: roleDoc._id,
+      active: true,
+    });
+
+    if (!role || roleToAssign === "patient") {
+      const Patient = require("../models/Patient");
+      const dossierPatient = await Patient.create({
+        utilisateur: utilisateur._id,
+        nom,
+        prenom,
+        email,
+      });
+      utilisateur.patient = dossierPatient._id;
+      await utilisateur.save();
+    }
+
+    res
+      .status(201)
+      .json({ message: "Utilisateur créé avec succès", utilisateur });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erreur serveur: " + err.message);
+  }
+};
+
+const schemaInscription = Joi.object({
+  nom: Joi.string().required(),
+  prenom: Joi.string().required(),
+  specialite: Joi.string().optional(),
+  email: Joi.string().email().required(),
+  motDePasse: Joi.string().min(6).required(),
+});
+
+const schemaMotDePasseOublie = Joi.object({
+  email: Joi.string().email().required(),
+});
+
+const schemaResetMotDePasse = Joi.object({
+  motDePasse: Joi.string().min(6).required(),
+});
+
+exports.inscription = async (req, res) => {
+  const { error } = schemaInscription.validate(req.body);
+  if (error) {
+    return res.status(400).json(error.details[0].message);
+  }
+  try {
+    const { email, motDePasse, nom, prenom, specialite } = req.body;
+    const existant = await UtilisateurDepot.findByEmail(email);
+    if (existant) return res.status(409).json("Le email existe déjà");
+
+    let rolePatient = await Role.findOne({ nom: "patient" });
+    if (!rolePatient) {
+      rolePatient = await Role.create({ nom: "patient" });
+    }
+
+    const utilisateur = await UtilisateurDepot.create({
+      email: email,
+      password: motDePasse,
+      nom,
+      prenom,
+      specialite: specialite,
+      role: rolePatient._id,
+      active: true,
+    });
+
+    const Patient = require("../models/Patient");
+    const patient = await Patient.create({
+      utilisateur: utilisateur._id,
+      nom,
+      prenom,
+      email,
+    });
+    utilisateur.patient = patient._id;
+    await utilisateur.save();
+
+    res
+      .status(201)
+      .json({ message: "Inscription réussie", utilisateur, patient });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erreur serveur: " + err.message);
+  }
+};
+
+exports.connexion = async (req, res) => {
+  const { email, motDePasse } = req.body;
+  const utilisateur = await UtilisateurDepot.findByEmail(email);
+  if (!utilisateur) {
+    return res.status(401).json("Informations incorrectes");
+  }
+  const motDePasseValide = await bcrypt.compare(
+    motDePasse,
+    utilisateur.password
+  );
+  if (!motDePasseValide) {
+    return res.status(401).json("Informations incorrectes");
+  }
+  if (!utilisateur.active) {
+    return res.status(403).json("Compte inactif");
+  }
+
+  const jetonAcces = jwt.sign(
+    { id: utilisateur._id, role: utilisateur.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "15m" }
+  );
+  const jetonRafraichissement = jwt.sign(
+    { id: utilisateur._id },
+    process.env.REFRESH_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  utilisateur.refreshToken = jetonRafraichissement;
+  utilisateur.accessToken = jetonAcces;
+  await utilisateur.save();
+
+  res.json({ jetonAcces, jetonRafraichissement });
+};
+
+exports.forgetPassword = async (req, res) => {
+  try {
+    const { error } = schemaMotDePasseOublie.validate(req.body);
+    if (error) {
+      return res.status(400).json({
+        message: "Données invalides",
+        erreur: error.details[0].message,
+      });
+    }
+
+    const { email } = req.body;
+    const user = await UtilisateurDepot.findByEmail(email);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    user.resetToken = resetToken;
+    user.resetTokenExpiry = Date.now() + 3600000;
+    await user.save();
+
+    await emailSen.envoyerEmail(user, resetToken);
+
+    res.status(200).json({
+      message: "Email de réinitialisation envoyé avec succès",
+    });
+  } catch (error) {
+    console.error("Erreur mot de passe oublié:", error);
+    res.status(500).json({
+      message: "Erreur serveur lors de l'envoi de l'email",
+      erreur: error.message,
+    });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { error } = schemaResetMotDePasse.validate(req.body);
+    if (error) {
+      return res.status(400).json({
+        message: "Mot de passe invalide",
+        erreur: error.details[0].message,
+      });
+    }
+
+    const { token } = req.params;
+    const { motDePasse } = req.body;
+
+    const user = await UtilisateurDepot.findByResetToken(token);
+    if (!user) {
+      return res.status(400).json({
+        message: "Token invalide ou expiré",
+      });
+    }
+
+    user.password = motDePasse;
+    user.resetToken = undefined;
+    user.resetTokenExpiry = undefined;
+    await user.save();
+
+    res.status(200).json({
+      message: "Mot de passe réinitialisé avec succès",
+    });
+  } catch (error) {
+    console.error("Erreur reset mot de passe:", error);
+    res.status(500).json({
+      message: "Erreur serveur lors de la réinitialisation",
+      erreur: error.message,
+    });
+  }
+};
