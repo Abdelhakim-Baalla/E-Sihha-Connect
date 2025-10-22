@@ -17,6 +17,7 @@ Bienvenue dans **E-Sihha Connect**, l'API backend innovante qui alimente les Dos
 - [Utilisation avec Docker](#utilisation-avec-docker)
 - [Documentation API](#documentation-api)
 - [Tests avec Postman](#tests-avec-postman)
+- [Tests automatisés](#tests-automatisés)
 - [Structure du projet](#structure-du-projet)
 - [Contributions](#contributions)
 - [Licence](#licence)
@@ -160,6 +161,22 @@ PORT=3000
 > `postman/E-Sihha-Connect.postman_collection.json`
 >
 > Importez-la dans Postman, renseignez les variables `base_url` et `token`, puis lancez vos tests !
+
+---
+
+## Tests automatisés
+
+Pour lancer tous les tests :
+```bash
+npm test
+```
+
+Pour générer un rapport de couverture :
+```bash
+npm run coverage
+```
+
+Le rapport s’affichera dans le terminal et sera disponible dans le dossier `coverage/`.
 
 ---
 
