@@ -4,7 +4,8 @@
   "description": "![Bannière E-Sihha Connect](assets/Images/text-logo-white.jpg)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha tests/*.test.js",
+    "coverage": "nyc mocha tests/*.test.js",
     "start": "node src/app.js"
   },
   "repository": {
@@ -20,18 +21,23 @@
   "homepage": "https://github.com/Abdelhakim-Baalla/E-Sihha-Connect#readme",
   "dependencies": {
     "bcrypt": "^6.0.0",
-    "chai": "^6.2.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "joi": "^18.0.1",
     "jsonwebtoken": "^9.0.2",
-    "mocha": "^11.7.4",
     "mongodb-memory-server": "^10.2.3",
     "mongoose": "^8.19.1",
     "morgan": "^1.10.1",
     "nodemailer": "^7.0.9",
     "redis": "^5.8.3",
-    "supertest": "^7.1.4",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "winston": "^3.18.3"
+  },
+  "devDependencies": {
+    "chai": "^6.2.0",
+    "mocha": "^11.7.4",
+    "nyc": "^17.1.0",
+    "supertest": "^7.1.4"
   }
 }

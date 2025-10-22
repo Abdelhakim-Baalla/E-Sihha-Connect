@@ -13,6 +13,8 @@ require("./models/MedicalHistorique");
 require("./models/Utilisateur");
 require("./models/Patient");
 require("./models/RendezVous");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./config/swagger");
 
 dotenv.config();
 
@@ -24,6 +26,8 @@ app.use("/api/v1/patients", patientRoutes);
 app.use("/api/v1/rendezvous", rendezVousRoutes);
 app.use("/api/v1/rendezvous", bookRendezVousRoutes);
 app.use("/api/v1/availability", availabilityRoutes);
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get("/", (req, res) => {
   res.send("Bienvenue sur E-Sihha Connect API");
