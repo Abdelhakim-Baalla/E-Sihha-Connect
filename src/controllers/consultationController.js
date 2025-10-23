@@ -79,3 +79,19 @@ exports.getByPatient = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.getMine = async (req, res) => {
+  try {
+    if (!req.utilisateur || !req.utilisateur.id) {
+      return res.status(401).json({ error: "Utilisateur non authentifié" });
+    }
+    const patient = await PatientRepository.findByUserId(req.utilisateur.id);
+    if (!patient) return res.status(404).json({ error: "Patient non trouvé" });
+    const consultations = await ConsultationRepository.findByPatient(
+      patient._id
+    );
+    res.json(consultations);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
