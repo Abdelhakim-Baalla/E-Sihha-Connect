@@ -28,6 +28,12 @@ class PatientRepository {
       .populate("medicalHistoriques");
   }
 
+  async findByUserId(userId) {
+    return await Patient.findOne({ utilisateur: userId })
+      .populate("allergies")
+      .populate("medicalHistoriques");
+  }
+
   async update(id, updates) {
     return await Patient.findByIdAndUpdate(id, updates, { new: true });
   }
