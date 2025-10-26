@@ -18,6 +18,13 @@ class PrescriptionRepository {
       createdAt: -1,
     });
   }
+
+  async findActiveByPatient(patientId) {
+    return await Prescription.find({
+      patient: patientId,
+      statut: { $in: ["signed", "sent"] },
+    }).sort({ createdAt: -1 });
+  }
 }
 
 module.exports = new PrescriptionRepository();
