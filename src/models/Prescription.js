@@ -30,7 +30,7 @@ const prescriptionSchema = new mongoose.Schema({
   },
   statut: {
     type: String,
-    enum: ["draft", "active", "annulee"],
+    enum: ["draft", "signed", "sent", "active", "annulee"],
     default: "draft",
   },
   notes: {

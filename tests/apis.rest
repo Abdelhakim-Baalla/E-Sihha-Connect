@@ -135,7 +135,9 @@ Authorization: Bearer {{patientToken}}
     "allergies": ["68f73c85b825417607f06a9d", "68f73cc5b825417607f06a9f"]
 }
 
-@doctorToken =
+@doctorToken = 
+@secretaireToken = 
+@prescriptionId = 
 
 ### Consultation dossier patient par médecin
 GET http://localhost:3000/api/v1/patients/{{patientId}}
@@ -179,4 +181,73 @@ Authorization: Bearer {{doctorToken}}
 
 ### Vérification des conflits par secrétaire
 GET http://localhost:3000/api/v1/rendezvous/check-conflicts?date=2025-10-22T11:00:00.000Z&duree=30&medecin=doctorId
-Authorization: Bearer secretaireToken
+Authorization: Bearer {{secretaireToken}}
+
+### --- Consultations ---
+
+### Création d'une consultation (médecin)
+POST http://localhost:3000/api/v1/consultations
+Content-Type: application/json
+Authorization: Bearer {{doctorToken}}
+
+{
+    "patient": "{{patientId}}",
+    "rendezVous": "",
+    "temperature": 37.2,
+    "tension_systolique": 120,
+    "tension_diastolique": 80,
+    "frequence_cardiaque": 72,
+    "frequence_respiratoire": 16,
+    "poids": 75,
+    "taille": 175,
+    "observations": "Consultation de routine"
+}
+
+### Récupérer les consultations d'un patient (médecin)
+GET http://localhost:3000/api/v1/consultations/patient/{{patientId}}
+Authorization: Bearer {{doctorToken}}
+
+### Récupérer mes consultations (patient connecté)
+GET http://localhost:3000/api/v1/consultations/me
+Authorization: Bearer {{patientToken}}
+
+### --- Prescriptions ---
+
+### Création d'une prescription (médecin)
+POST http://localhost:3000/api/v1/prescriptions
+Content-Type: application/json
+Authorization: Bearer {{doctorToken}}
+
+{
+    "patient": "{{patientId}}",
+    "consultation": "",
+    "medicaments": [
+        {
+            "nom": "Paracétamol",
+            "dosage": "500mg",
+            "voie": "orale",
+            "frequence": "3x/j",
+            "duree": "5 jours",
+            "renouvellements": 0
+        }
+    ],
+    "notes": "Prendre après les repas",
+    "statut": "draft"
+}
+
+### Récupérer les prescriptions d'un patient (médecin)
+GET http://localhost:3000/api/v1/prescriptions/patient/{{patientId}}
+Authorization: Bearer {{doctorToken}}
+
+### Récupérer mes prescriptions (patient connecté)
+GET http://localhost:3000/api/v1/prescriptions/me
+Authorization: Bearer {{patientToken}}
+
+### Récupérer mes prescriptions actives (patient connecté)
+GET http://localhost:3000/api/v1/prescriptions/me/active
+Authorization: Bearer {{patientToken}}
+
+### Récupérer une prescription par ID
+GET http://localhost:3000/api/v1/prescriptions/{{prescriptionId}}
+Authorization: Bearer {{patientToken}}
+
