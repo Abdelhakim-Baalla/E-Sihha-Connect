@@ -16,7 +16,9 @@ const createSchema = Joi.object({
   consultation: Joi.string().optional(),
   medicaments: Joi.array().items(medicamentSchema).min(1).required(),
   notes: Joi.string().optional(),
-  statut: Joi.string().valid("draft", "active", "annulee").optional(),
+  statut: Joi.string()
+    .valid("draft", "signed", "sent", "active", "annulee")
+    .optional(),
 });
 
 exports.createPrescription = async (req, res) => {
@@ -77,6 +79,21 @@ exports.getMine = async (req, res) => {
     const patient = await PatientRepository.findByUserId(req.utilisateur.id);
     if (!patient) return res.status(404).json({ error: "Patient non trouvé" });
     const prescriptions = await PrescriptionRepository.findByPatient(
+      patient._id
+    );
+    res.json(prescriptions);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.getActiveMine = async (req, res) => {
+  try {
+    if (!req.utilisateur || !req.utilisateur.id)
+      return res.status(401).json({ error: "Utilisateur non authentifié" });
+    const patient = await PatientRepository.findByUserId(req.utilisateur.id);
+    if (!patient) return res.status(404).json({ error: "Patient non trouvé" });
+    const prescriptions = await PrescriptionRepository.findActiveByPatient(
       patient._id
     );
     res.json(prescriptions);
