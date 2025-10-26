@@ -6,6 +6,7 @@ const patientRoutes = require("./routes/patientRoutes");
 const rendezVousRoutes = require("./routes/rendezVousRoutes");
 const availabilityRoutes = require("./routes/availabilityRoutes");
 const consultationRoutes = require("./routes/consultationRoutes");
+const prescriptionRoutes = require("./routes/prescriptionRoutes");
 const connectDB = require("./config/db");
 const { seedRoles } = require("./seeders/roleSeeder");
 const { seedUtilisateurs } = require("./seeders/utilisateurSeeder");
@@ -15,6 +16,7 @@ require("./models/Utilisateur");
 require("./models/Patient");
 require("./models/RendezVous");
 require("./models/Consultation");
+require("./models/Prescription");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
 
@@ -29,6 +31,7 @@ app.use("/api/v1/rendezvous", rendezVousRoutes);
 app.use("/api/v1/rendezvous", bookRendezVousRoutes);
 app.use("/api/v1/availability", availabilityRoutes);
 app.use("/api/v1/consultations", consultationRoutes);
+app.use("/api/v1/prescriptions", prescriptionRoutes);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
