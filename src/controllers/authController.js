@@ -6,6 +6,26 @@ const crypto = require("crypto");
 const emailSen = require("../utils/EnvoyerEmail");
 const Role = require("../models/Role");
 
+const roleAliases = {
+  doctor: "medecin",
+  médecin: "medecin",
+  docteur: "medecin",
+  nurse: "infirmier",
+  infirmiere: "infirmier",
+  infirmier: "infirmier",
+  secretary: "secretaire",
+  secretaire: "secretaire",
+  admin: "admin",
+  patient: "patient",
+  medecin: "medecin",
+};
+
+const normalizeRoleName = (value) => {
+  if (!value) return value;
+  const normalized = value.toString().trim().toLowerCase();
+  return roleAliases[normalized] || normalized;
+};
+
 exports.suspendUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -62,7 +82,7 @@ exports.createUserWithRole = async (req, res) => {
     const existant = await UtilisateurDepot.findByEmail(email);
     if (existant) return res.status(409).json("Le email existe déjà");
 
-    let roleToAssign = role;
+    let roleToAssign = normalizeRoleName(role);
     let roleDoc = null;
     if (!roleToAssign) {
       roleDoc = await Role.findOne({ nom: "patient" });
@@ -125,7 +145,7 @@ const schemaResetMotDePasse = Joi.object({
 exports.inscription = async (req, res) => {
   const { error } = schemaInscription.validate(req.body);
   if (error) {
-    return res.status(400).json({error: error.details[0].message});
+    return res.status(400).json({ error: error.details[0].message });
   }
   try {
     const { email, motDePasse, nom, prenom, specialite } = req.body;

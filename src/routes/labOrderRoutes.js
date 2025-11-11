@@ -71,6 +71,16 @@ const { verifyToken, isDoctor } = require("../middlewares/authMiddleware");
  *         updatedAt:
  *           type: string
  *           format: date-time
+ *     LabReportLink:
+ *       type: object
+ *       properties:
+ *         url:
+ *           type: string
+ *         expiresAt:
+ *           type: string
+ *           format: date-time
+ *         ttlMinutes:
+ *           type: integer
  */
 
 /**
@@ -178,6 +188,74 @@ router.get(
   isDoctor,
   labOrderController.getByPatient
 );
+
+/**
+ * @swagger
+ * /api/v1/laborders/{id}/report-link:
+ *   get:
+ *     summary: Générer un lien temporaire pour télécharger le rapport PDF
+ *     description: Accessible au médecin qui a créé l'ordre de laboratoire.
+ *     tags: [LabOrders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lien généré avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LabReportLink'
+ *       403:
+ *         description: Accès refusé
+ *       404:
+ *         description: Ordre non trouvé
+ */
+router.get(
+  "/:id/report-link",
+  verifyToken,
+  isDoctor,
+  labOrderController.getLabOrderDownloadLink
+);
+
+/**
+ * @swagger
+ * /api/v1/laborders/{id}/report:
+ *   get:
+ *     summary: Télécharger le rapport PDF d'un ordre de laboratoire
+ *     description: Requiert un token temporaire obtenu via l'endpoint report-link.
+ *     tags: [LabOrders]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Jeton temporaire signé
+ *     responses:
+ *       200:
+ *         description: Rapport PDF
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       400:
+ *         description: Token invalide
+ *       410:
+ *         description: Lien expiré
+ */
+router.get("/:id/report", labOrderController.downloadLabOrderReport);
 
 /**
  * @swagger

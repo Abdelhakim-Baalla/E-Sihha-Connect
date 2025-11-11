@@ -1,10 +1,11 @@
-@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZWQ0NWM0YmVkYmZlMmRkMDJkMzQwNiIsInJvbGUiOiI2OGVkMzk3NDllNDhjNTc5ODMyMjYzMjciLCJpYXQiOjE3NjA5Njc3NTQsImV4cCI6MTc2MDk2ODY1NH0.JhS_iOwvpi0_pfJaKg6W0YhB85_5fFQsSuEX05mAJq8
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZWQ0NWM0YmVkYmZlMmRkMDJkMzQwNiIsInJvbGUiOiI2OGVkMzdmZWMzNjg5ZjI5MTljMTE1N2IiLCJpYXQiOjE3NjI4NTQ0NjYsImV4cCI6MTc2Mjg1NTM2Nn0.Lt3SzA0SwOpZguWCn6R8uJq7Bcw37lXq7qmV4x9GWeU
 @patientId = 68f63f7ee3de5b5a7cb2a515
 @patientToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjYzZjdlZTNkZTViNWE3Y2IyYTUxMyIsInJvbGUiOiI2OGVkMzkxNTZhYTBkM2MxMGQxZjU2Y2EiLCJpYXQiOjE3NjEwMzMyMTksImV4cCI6MTc2MTAzNDExOX0.5A6Pv5DJyxnWOd6QHuEg_9zWKByoMN3epNlURIZgKjc
-@doctorToken = 
+@doctorToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MTMwNmIwMGQ1Y2M5MGExODNmM2VjYyIsInJvbGUiOiI2OGVkMzkyNjllNjQwMjlhMDkxYzQzYzMiLCJpYXQiOjE3NjI4NTQ2MjcsImV4cCI6MTc2Mjg1NTUyN30.b0j_7RW_IiYzCFGmY7788Y1iXsV1qEhDcYuf4ToltN4
 @secretaireToken = 
 @prescriptionId = 
 @labOrderId = 
+@labReportToken = 
 ### Inscription
 POST http://localhost:3000/api/v1/inscription
 Content-Type: application/json
@@ -40,7 +41,7 @@ Content-Type: application/json
 
 {
     "email": "doctor@email.com",
-    "motDePasse": "doctorpassword"
+    "motDePasse": "123456789"
 }
 
 ### Mot de passe oublié
@@ -65,11 +66,11 @@ Content-Type: application/json
 Authorization: Bearer {{adminToken}}
 
 {
-    "nom": "Patient",
+    "nom": "doctor",
     "prenom": "Test",
-    "email": "patient3@email.com",
+    "email": "doctor@email.com",
     "motDePasse": "123456789",
-    "role": "patient"
+    "role": "doctor"
 }
 
 ### Suspendre un utilisateur
@@ -139,7 +140,6 @@ Authorization: Bearer {{patientToken}}
     "allergies": ["68f73c85b825417607f06a9d", "68f73cc5b825417607f06a9f"]
 }
 
-@doctorToken =
 
 ### Consultation dossier patient par médecin
 GET http://localhost:3000/api/v1/patients/{{patientId}}
@@ -262,7 +262,7 @@ Authorization: Bearer {{doctorToken}}
 
 {
     "patient": "{{patientId}}",
-    "consultation": "",
+    "consultation": "68fa48c3ec95f3f38eadac40",
     "tests": [
         {
             "code": "HB1",
@@ -285,6 +285,8 @@ Authorization: Bearer {{doctorToken}}
     ]
 }
 
+@labOrderId = 691307d50d5cc90a183f3edc
+
 ### Récupérer les ordres de laboratoire d'un patient (médecin)
 GET http://localhost:3000/api/v1/laborders/patient/{{patientId}}
 Authorization: Bearer {{doctorToken}}
@@ -296,3 +298,11 @@ Authorization: Bearer {{patientToken}}
 ### Récupérer un ordre de laboratoire par ID
 GET http://localhost:3000/api/v1/laborders/{{labOrderId}}
 Authorization: Bearer {{patientToken}}
+
+### Générer un lien de téléchargement pour un rapport PDF (médecin)
+GET http://localhost:3000/api/v1/laborders/{{labOrderId}}/report-link
+Authorization: Bearer {{doctorToken}}
+
+### Télécharger le rapport PDF via le lien temporaire
+# Remplacer {{labReportToken}} par la valeur retournée dans la réponse précédente.
+GET http://localhost:3000/api/v1/laborders/{{labOrderId}}/report?token={{labReportToken}}
