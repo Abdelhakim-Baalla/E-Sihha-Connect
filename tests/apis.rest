@@ -1,6 +1,10 @@
 @adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZWQ0NWM0YmVkYmZlMmRkMDJkMzQwNiIsInJvbGUiOiI2OGVkMzk3NDllNDhjNTc5ODMyMjYzMjciLCJpYXQiOjE3NjA5Njc3NTQsImV4cCI6MTc2MDk2ODY1NH0.JhS_iOwvpi0_pfJaKg6W0YhB85_5fFQsSuEX05mAJq8
 @patientId = 68f63f7ee3de5b5a7cb2a515
 @patientToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjYzZjdlZTNkZTViNWE3Y2IyYTUxMyIsInJvbGUiOiI2OGVkMzkxNTZhYTBkM2MxMGQxZjU2Y2EiLCJpYXQiOjE3NjEwMzMyMTksImV4cCI6MTc2MTAzNDExOX0.5A6Pv5DJyxnWOd6QHuEg_9zWKByoMN3epNlURIZgKjc
+@doctorToken = 
+@secretaireToken = 
+@prescriptionId = 
+@labOrderId = 
 ### Inscription
 POST http://localhost:3000/api/v1/inscription
 Content-Type: application/json
@@ -135,9 +139,7 @@ Authorization: Bearer {{patientToken}}
     "allergies": ["68f73c85b825417607f06a9d", "68f73cc5b825417607f06a9f"]
 }
 
-@doctorToken = 
-@secretaireToken = 
-@prescriptionId = 
+@doctorToken =
 
 ### Consultation dossier patient par médecin
 GET http://localhost:3000/api/v1/patients/{{patientId}}
@@ -181,7 +183,7 @@ Authorization: Bearer {{doctorToken}}
 
 ### Vérification des conflits par secrétaire
 GET http://localhost:3000/api/v1/rendezvous/check-conflicts?date=2025-10-22T11:00:00.000Z&duree=30&medecin=doctorId
-Authorization: Bearer {{secretaireToken}}
+Authorization: Bearer secretaireToken
 
 ### --- Consultations ---
 
@@ -191,16 +193,16 @@ Content-Type: application/json
 Authorization: Bearer {{doctorToken}}
 
 {
-    "patient": "{{patientId}}",
-    "rendezVous": "",
-    "temperature": 37.2,
-    "tension_systolique": 120,
-    "tension_diastolique": 80,
-    "frequence_cardiaque": 72,
-    "frequence_respiratoire": 16,
-    "poids": 75,
-    "taille": 175,
-    "observations": "Consultation de routine"
+        "patient": "{{patientId}}",
+        "rendezVous": "",
+        "temperature": 37.2,
+        "tension_systolique": 120,
+        "tension_diastolique": 80,
+        "frequence_cardiaque": 72,
+        "frequence_respiratoire": 16,
+        "poids": 75,
+        "taille": 175,
+        "observations": "Consultation de routine"
 }
 
 ### Récupérer les consultations d'un patient (médecin)
@@ -219,20 +221,20 @@ Content-Type: application/json
 Authorization: Bearer {{doctorToken}}
 
 {
-    "patient": "{{patientId}}",
-    "consultation": "",
-    "medicaments": [
-        {
-            "nom": "Paracétamol",
-            "dosage": "500mg",
-            "voie": "orale",
-            "frequence": "3x/j",
-            "duree": "5 jours",
-            "renouvellements": 0
-        }
-    ],
-    "notes": "Prendre après les repas",
-    "statut": "draft"
+        "patient": "{{patientId}}",
+        "consultation": "",
+        "medicaments": [
+                {
+                        "nom": "Paracétamol",
+                        "dosage": "500mg",
+                        "voie": "orale",
+                        "frequence": "3x/j",
+                        "duree": "5 jours",
+                        "renouvellements": 0
+                }
+        ],
+        "notes": "Prendre après les repas",
+        "statut": "draft"
 }
 
 ### Récupérer les prescriptions d'un patient (médecin)
@@ -249,5 +251,33 @@ Authorization: Bearer {{patientToken}}
 
 ### Récupérer une prescription par ID
 GET http://localhost:3000/api/v1/prescriptions/{{prescriptionId}}
+Authorization: Bearer {{patientToken}}
+
+### --- Ordres de laboratoire ---
+
+### Création d'un ordre de laboratoire (médecin)
+POST http://localhost:3000/api/v1/laborders
+Content-Type: application/json
+Authorization: Bearer {{doctorToken}}
+
+{
+    "patient": "{{patientId}}",
+    "consultation": "",
+    "tests": [
+        { "code": "HB1", "nom": "Hémogramme complet", "instructions": "À jeun" },
+        { "code": "CRP", "nom": "CRP", "instructions": "Standard" }
+    ]
+}
+
+### Récupérer les ordres de laboratoire d'un patient (médecin)
+GET http://localhost:3000/api/v1/laborders/patient/{{patientId}}
+Authorization: Bearer {{doctorToken}}
+
+### Récupérer mes ordres de laboratoire (patient connecté)
+GET http://localhost:3000/api/v1/laborders/me
+Authorization: Bearer {{patientToken}}
+
+### Récupérer un ordre de laboratoire par ID
+GET http://localhost:3000/api/v1/laborders/{{labOrderId}}
 Authorization: Bearer {{patientToken}}
 

@@ -125,7 +125,7 @@ const schemaResetMotDePasse = Joi.object({
 exports.inscription = async (req, res) => {
   const { error } = schemaInscription.validate(req.body);
   if (error) {
-    return res.status(400).json(error.details[0].message);
+    return res.status(400).json({error: error.details[0].message});
   }
   try {
     const { email, motDePasse, nom, prenom, specialite } = req.body;
