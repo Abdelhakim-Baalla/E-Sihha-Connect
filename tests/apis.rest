@@ -264,8 +264,24 @@ Authorization: Bearer {{doctorToken}}
     "patient": "{{patientId}}",
     "consultation": "",
     "tests": [
-        { "code": "HB1", "nom": "Hémogramme complet", "instructions": "À jeun" },
-        { "code": "CRP", "nom": "CRP", "instructions": "Standard" }
+        {
+            "code": "HB1",
+            "nom": "Hémogramme complet",
+            "instructions": "À jeun",
+            "resultatValeur": 11.2,
+            "resultatUnite": "g/dL",
+            "referenceMin": 12,
+            "referenceMax": 16
+        },
+        {
+            "code": "CRP",
+            "nom": "CRP",
+            "instructions": "Standard",
+            "resultatValeur": 18,
+            "resultatUnite": "mg/L",
+            "referenceMin": 0,
+            "referenceMax": 5
+        }
     ]
 }
 
@@ -280,4 +296,3 @@ Authorization: Bearer {{patientToken}}
 ### Récupérer un ordre de laboratoire par ID
 GET http://localhost:3000/api/v1/laborders/{{labOrderId}}
 Authorization: Bearer {{patientToken}}
-

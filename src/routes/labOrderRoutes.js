@@ -23,6 +23,27 @@ const { verifyToken, isDoctor } = require("../middlewares/authMiddleware");
  *           type: string
  *         instructions:
  *           type: string
+ *         resultatValeur:
+ *           type: number
+ *           description: Valeur numérique retournée par le laboratoire
+ *           example: 13.5
+ *         resultatUnite:
+ *           type: string
+ *           description: Unité de mesure de la valeur
+ *           example: g/dL
+ *         referenceMin:
+ *           type: number
+ *           description: Limite inférieure de la plage de référence
+ *           example: 12
+ *         referenceMax:
+ *           type: number
+ *           description: Limite supérieure de la plage de référence
+ *           example: 16
+ *         flag:
+ *           type: string
+ *           description: Indicateur calculé (low, high, normal, unknown)
+ *           enum: [low, high, normal, unknown]
+ *           readOnly: true
  *       required:
  *         - nom
  *     LabOrder:
@@ -98,6 +119,18 @@ const { verifyToken, isDoctor } = require("../middlewares/authMiddleware");
  *                       type: string
  *                       description: Consignes pour le laboratoire
  *                       example: A jeun
+ *                     resultatValeur:
+ *                       type: number
+ *                       description: Valeur mesurée (optionnel, utile pour restituer un résultat)
+ *                     resultatUnite:
+ *                       type: string
+ *                       description: Unité de mesure, par exemple g/dL
+ *                     referenceMin:
+ *                       type: number
+ *                       description: Borne inférieure de la plage de référence
+ *                     referenceMax:
+ *                       type: number
+ *                       description: Borne supérieure de la plage de référence
  *     responses:
  *       201:
  *         description: Ordre de laboratoire créé

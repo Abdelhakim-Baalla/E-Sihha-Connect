@@ -1,11 +1,19 @@
 const LabOrderRepository = require("../repositories/LabOrderRepository");
 const PatientRepository = require("../repositories/PatientRepository");
 const Joi = require("joi");
+const {
+  decorateOrderWithFlags,
+  decorateOrdersWithFlags,
+} = require("../utils/labResultFlagger");
 
 const testSchema = Joi.object({
   code: Joi.string().optional(),
   nom: Joi.string().required(),
   instructions: Joi.string().optional(),
+  resultatValeur: Joi.number().optional(),
+  resultatUnite: Joi.string().optional(),
+  referenceMin: Joi.number().optional(),
+  referenceMax: Joi.number().optional(),
 });
 
 const createSchema = Joi.object({
@@ -35,7 +43,7 @@ exports.createLabOrder = async (req, res) => {
       statut: "ordered",
     });
 
-    res.status(201).json(order);
+    res.status(201).json(decorateOrderWithFlags(order));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
@@ -45,7 +53,7 @@ exports.createLabOrder = async (req, res) => {
 exports.getByPatient = async (req, res) => {
   try {
     const orders = await LabOrderRepository.findByPatient(req.params.patientId);
-    res.json(orders);
+    res.json(decorateOrdersWithFlags(orders));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -55,7 +63,7 @@ exports.getById = async (req, res) => {
   try {
     const order = await LabOrderRepository.findById(req.params.id);
     if (!order) return res.status(404).json({ error: "Ordre non trouvé" });
-    res.json(order);
+    res.json(decorateOrderWithFlags(order));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -68,7 +76,7 @@ exports.getMine = async (req, res) => {
     const patient = await PatientRepository.findByUserId(req.utilisateur.id);
     if (!patient) return res.status(404).json({ error: "Patient non trouvé" });
     const orders = await LabOrderRepository.findByPatient(patient._id);
-    res.json(orders);
+    res.json(decorateOrdersWithFlags(orders));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

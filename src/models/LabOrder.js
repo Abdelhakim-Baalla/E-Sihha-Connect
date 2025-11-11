@@ -1,10 +1,17 @@
 const mongoose = require("mongoose");
 
-const testSchema = new mongoose.Schema({
-  code: { type: String },
-  nom: { type: String, required: true },
-  instructions: { type: String },
-});
+const testSchema = new mongoose.Schema(
+  {
+    code: { type: String },
+    nom: { type: String, required: true },
+    instructions: { type: String },
+    resultatValeur: { type: Number },
+    resultatUnite: { type: String },
+    referenceMin: { type: Number },
+    referenceMax: { type: Number },
+  },
+  { _id: false }
+);
 
 const labOrderSchema = new mongoose.Schema({
   patient: {
