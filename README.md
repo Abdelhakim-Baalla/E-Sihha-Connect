@@ -55,9 +55,13 @@ Dans le monde rapide des soins de santé, les cliniques ont besoin d'outils fiab
   - Traitement basé sur des files d'attente avec Redis pour la fiabilité.
   - Notifications pour les rendez-vous approchants (médecins).
 - **Gestion des Prescriptions** :
-   - Génération d'ordonnances par les médecins avec suivi des médicaments.
-   - Visualisation côté patient (toutes les ordonnances ou uniquement les actives).
-   - Mise à jour du statut (draft, envoyée, dispensée, etc.) pour informer les patients en temps quasi réel.
+  - Génération d'ordonnances par les médecins avec suivi des médicaments.
+  - Visualisation côté patient (toutes les ordonnances ou uniquement les actives).
+  - Mise à jour du statut (draft, envoyée, dispensée, etc.) pour informer les patients en temps quasi réel.
+- **Résultats de Laboratoire** :
+  - Création et suivi des ordres labo par les médecins.
+  - Visualisation côté patient de tous ses ordres.
+  - Endpoint dédié pour consulter uniquement ses résultats complétés (statut "completed").
 - **Sécurité & Meilleures Pratiques** :
   - Validation des entrées avec Joi.
   - Gestion centralisée des erreurs et logging (Winston).
@@ -106,6 +110,7 @@ Dans le monde rapide des soins de santé, les cliniques ont besoin d'outils fiab
    ```bash
    npm install
    ```
+
 3. **Configurer les variables d’environnement**
    - Copier `.env.example` en `.env` et renseigner les valeurs (MongoDB, Redis, SMTP...)
 4. **Lancer la base MongoDB et Redis**
@@ -142,6 +147,7 @@ PORT=3000
    ```bash
    docker-compose up --build
    ```
+
 2. **Arrêter les services :**
 
    ```bash

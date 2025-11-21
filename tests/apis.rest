@@ -304,6 +304,10 @@ Authorization: Bearer {{doctorToken}}
 GET http://localhost:3000/api/v1/laborders/me
 Authorization: Bearer {{patientToken}}
 
+### Récupérer uniquement mes résultats complétés (patient connecté)
+GET http://localhost:3000/api/v1/laborders/me/results
+Authorization: Bearer {{patientToken}}
+
 ### Récupérer un ordre de laboratoire par ID
 GET http://localhost:3000/api/v1/laborders/{{labOrderId}}
 Authorization: Bearer {{patientToken}}

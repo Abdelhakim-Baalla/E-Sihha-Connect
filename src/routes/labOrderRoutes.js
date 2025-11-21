@@ -281,6 +281,29 @@ router.get("/me", verifyToken, labOrderController.getMine);
 
 /**
  * @swagger
+ * /api/v1/laborders/me/results:
+ *   get:
+ *     summary: Récupérer les résultats de laboratoire complétés du patient connecté
+ *     description: Retourne uniquement les ordres avec statut "completed" et inclut les résultats associés aux tests.
+ *     tags: [LabOrders]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Liste des résultats complétés
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/LabOrder'
+ *       401:
+ *         description: Utilisateur non authentifié
+ */
+router.get("/me/results", verifyToken, labOrderController.getMyResults);
+
+/**
+ * @swagger
  * /api/v1/laborders/{id}:
  *   get:
  *     summary: Récupérer un ordre de laboratoire par identifiant
