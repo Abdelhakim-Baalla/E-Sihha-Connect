@@ -339,6 +339,10 @@ rapport
 GET http://localhost:3000/api/v1/patients/{{patientId}}/documents
 Authorization: Bearer {{doctorToken}}
 
+### Récupérer les documents d'un patient filtrés par type
+GET http://localhost:3000/api/v1/patients/{{patientId}}/documents?type=rapport
+Authorization: Bearer {{doctorToken}}
+
 ### Télécharger un document
 GET http://localhost:3000/api/v1/documents/{{documentId}}/download
 Authorization: Bearer {{doctorToken}}

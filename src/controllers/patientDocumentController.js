@@ -19,7 +19,9 @@ exports.uploadDocument = async (req, res) => {
     if (!patient) return res.status(404).json({ error: "Patient non trouvé" });
 
     if (req.file.size > MAX_FILE_SIZE) {
-      return res.status(400).json({ error: "Fichier trop volumineux (max 20MB)" });
+      return res
+        .status(400)
+        .json({ error: "Fichier trop volumineux (max 20MB)" });
     }
 
     const objectName = `${patientId}/${uuidv4()}-${req.file.originalname}`;
@@ -51,7 +53,21 @@ exports.uploadDocument = async (req, res) => {
 
 exports.getPatientDocuments = async (req, res) => {
   try {
-    const documents = await PatientDocumentRepository.findByPatient(req.params.patientId);
+    const { type } = req.query;
+    const allowedTypes = ["image", "rapport", "autre"];
+
+    if (type && !allowedTypes.includes(type)) {
+      return res
+        .status(400)
+        .json({
+          error: "Type invalide. Valeurs autorisées: image, rapport, autre.",
+        });
+    }
+
+    const documents = await PatientDocumentRepository.findByPatient(
+      req.params.patientId,
+      { type }
+    );
     res.json(documents);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -61,9 +77,13 @@ exports.getPatientDocuments = async (req, res) => {
 exports.downloadDocument = async (req, res) => {
   try {
     const document = await PatientDocumentRepository.findById(req.params.id);
-    if (!document) return res.status(404).json({ error: "Document non trouvé" });
+    if (!document)
+      return res.status(404).json({ error: "Document non trouvé" });
 
-    const dataStream = await minioClient.getObject(BUCKET_NAME, document.objectName);
+    const dataStream = await minioClient.getObject(
+      BUCKET_NAME,
+      document.objectName
+    );
 
     res.set({
       "Content-Type": document.mimeType,
@@ -81,10 +101,13 @@ exports.deleteDocument = async (req, res) => {
 
   try {
     const document = await PatientDocumentRepository.findById(req.params.id);
-    if (!document) return res.status(404).json({ error: "Document non trouvé" });
+    if (!document)
+      return res.status(404).json({ error: "Document non trouvé" });
 
     if (document.medecin._id.toString() !== medecinId) {
-      return res.status(403).json({ error: "Seul le médecin qui a uploadé peut supprimer" });
+      return res
+        .status(403)
+        .json({ error: "Seul le médecin qui a uploadé peut supprimer" });
     }
 
     await minioClient.removeObject(BUCKET_NAME, document.objectName);

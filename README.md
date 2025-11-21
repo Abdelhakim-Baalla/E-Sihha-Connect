@@ -209,6 +209,7 @@ rapport
 ### 5. Routines de vérification
 
 - **Lister** : `GET /api/v1/patients/{patientId}/documents`.
+- **Filtrer par type** : ajoutez `?type=image|rapport|autre` à la requête précédente pour ne récupérer qu’un type précis.
 - **Télécharger** : `GET /api/v1/documents/{documentId}/download`.
 - **Supprimer** : `DELETE /api/v1/documents/{documentId}` (uniquement par le médecin qui a uploadé le fichier).
 
@@ -240,11 +241,13 @@ Ces routes sont déjà couvertes dans `tests/apis.rest`. Pour des tests automati
 ## Tests automatisés
 
 Pour lancer tous les tests :
+
 ```bash
 npm test
 ```
 
 Pour générer un rapport de couverture :
+
 ```bash
 npm run coverage
 ```

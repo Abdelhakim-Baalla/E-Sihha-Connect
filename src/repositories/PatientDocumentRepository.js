@@ -6,8 +6,14 @@ class PatientDocumentRepository {
     return await document.save();
   }
 
-  async findByPatient(patientId) {
-    return await PatientDocument.find({ patient: patientId })
+  async findByPatient(patientId, filters = {}) {
+    const query = { patient: patientId };
+
+    if (filters.type) {
+      query.type = filters.type;
+    }
+
+    return await PatientDocument.find(query)
       .populate("medecin", "nom prenom")
       .sort({ createdAt: -1 });
   }

@@ -50,7 +50,13 @@ const upload = require("../middlewares/uploadMiddleware");
  *       400:
  *         description: Fichier invalide
  */
-router.post("/:patientId/documents", verifyToken, isDoctor, upload.single("file"), patientDocumentController.uploadDocument);
+router.post(
+  "/:patientId/documents",
+  verifyToken,
+  isDoctor,
+  upload.single("file"),
+  patientDocumentController.uploadDocument
+);
 
 /**
  * @swagger
@@ -66,11 +72,22 @@ router.post("/:patientId/documents", verifyToken, isDoctor, upload.single("file"
  *         required: true
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: type
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [image, rapport, autre]
+ *         description: Filtrer les documents par type
  *     responses:
  *       200:
  *         description: Liste des documents
  */
-router.get("/:patientId/documents", verifyToken, patientDocumentController.getPatientDocuments);
+router.get(
+  "/:patientId/documents",
+  verifyToken,
+  patientDocumentController.getPatientDocuments
+);
 
 /**
  * @swagger
@@ -90,7 +107,11 @@ router.get("/:patientId/documents", verifyToken, patientDocumentController.getPa
  *       200:
  *         description: Fichier téléchargé
  */
-router.get("/documents/:id/download", verifyToken, patientDocumentController.downloadDocument);
+router.get(
+  "/documents/:id/download",
+  verifyToken,
+  patientDocumentController.downloadDocument
+);
 
 /**
  * @swagger
@@ -110,6 +131,11 @@ router.get("/documents/:id/download", verifyToken, patientDocumentController.dow
  *       200:
  *         description: Document supprimé
  */
-router.delete("/documents/:id", verifyToken, isDoctor, patientDocumentController.deleteDocument);
+router.delete(
+  "/documents/:id",
+  verifyToken,
+  isDoctor,
+  patientDocumentController.deleteDocument
+);
 
 module.exports = router;
