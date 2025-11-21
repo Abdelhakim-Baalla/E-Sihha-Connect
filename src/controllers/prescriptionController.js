@@ -17,8 +17,29 @@ const createSchema = Joi.object({
   medicaments: Joi.array().items(medicamentSchema).min(1).required(),
   notes: Joi.string().optional(),
   statut: Joi.string()
-    .valid("draft", "signed", "sent", "active", "annulee")
+    .valid(
+      "draft",
+      "signed",
+      "sent",
+      "active",
+      "annulee",
+      "envoyee",
+      "dispensee"
+    )
     .optional(),
+});
+const statusSchema = Joi.object({
+  statut: Joi.string()
+    .valid(
+      "draft",
+      "signed",
+      "sent",
+      "active",
+      "annulee",
+      "envoyee",
+      "dispensee"
+    )
+    .required(),
 });
 
 exports.createPrescription = async (req, res) => {
@@ -97,6 +118,25 @@ exports.getActiveMine = async (req, res) => {
       patient._id
     );
     res.json(prescriptions);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.updateStatus = async (req, res) => {
+  const { error } = statusSchema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+
+  try {
+    const prescription = await PrescriptionRepository.updateStatus(
+      req.params.id,
+      req.body.statut
+    );
+
+    if (!prescription)
+      return res.status(404).json({ error: "Prescription non trouvée" });
+
+    res.json(prescription);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

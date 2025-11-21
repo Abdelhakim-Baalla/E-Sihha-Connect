@@ -22,8 +22,16 @@ class PrescriptionRepository {
   async findActiveByPatient(patientId) {
     return await Prescription.find({
       patient: patientId,
-      statut: { $in: ["signed", "sent"] },
+      statut: { $in: ["signed", "sent", "envoyee"] },
     }).sort({ createdAt: -1 });
+  }
+
+  async updateStatus(id, statut) {
+    return await Prescription.findByIdAndUpdate(
+      id,
+      { statut, updatedAt: new Date() },
+      { new: true }
+    );
   }
 }
 

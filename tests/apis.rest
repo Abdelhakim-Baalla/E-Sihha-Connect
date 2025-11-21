@@ -253,6 +253,15 @@ Authorization: Bearer {{patientToken}}
 GET http://localhost:3000/api/v1/prescriptions/{{prescriptionId}}
 Authorization: Bearer {{patientToken}}
 
+### Mettre à jour le statut d'une prescription (médecin)
+PATCH http://localhost:3000/api/v1/prescriptions/{{prescriptionId}}/statut
+Content-Type: application/json
+Authorization: Bearer {{doctorToken}}
+
+{
+    "statut": "dispensee"
+}
+
 ### --- Ordres de laboratoire ---
 
 ### Création d'un ordre de laboratoire (médecin)

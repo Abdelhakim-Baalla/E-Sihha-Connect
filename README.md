@@ -54,6 +54,10 @@ Dans le monde rapide des soins de santé, les cliniques ont besoin d'outils fiab
   - Rappels automatisés par email (24h avant les rendez-vous).
   - Traitement basé sur des files d'attente avec Redis pour la fiabilité.
   - Notifications pour les rendez-vous approchants (médecins).
+- **Gestion des Prescriptions** :
+   - Génération d'ordonnances par les médecins avec suivi des médicaments.
+   - Visualisation côté patient (toutes les ordonnances ou uniquement les actives).
+   - Mise à jour du statut (draft, envoyée, dispensée, etc.) pour informer les patients en temps quasi réel.
 - **Sécurité & Meilleures Pratiques** :
   - Validation des entrées avec Joi.
   - Gestion centralisée des erreurs et logging (Winston).
@@ -81,6 +85,7 @@ Dans le monde rapide des soins de santé, les cliniques ont besoin d'outils fiab
 ## Guide d'installation
 
 ### Prérequis
+ 
 - Node.js >= 16.x
 - npm >= 8.x
 - Docker & Docker Compose
@@ -95,6 +100,7 @@ Dans le monde rapide des soins de santé, les cliniques ont besoin d'outils fiab
    git clone https://github.com/Abdelhakim-Baalla/E-Sihha-Connect
    cd E-Sihha-Connect
    ```
+
 2. **Installer les dépendances**
 
    ```bash
@@ -109,6 +115,7 @@ Dans le monde rapide des soins de santé, les cliniques ont besoin d'outils fiab
    ```bash
    npm start
    ```
+
    L’API sera disponible sur `http://localhost:3000`.
 
 ---
@@ -166,8 +173,8 @@ MINIO_BUCKET=patient-documents
 docker compose up -d minio
 ```
 
-- Console d’admin : http://localhost:9001 (login `minioadmin` / `minioadmin`).
-- API S3-compatible : http://localhost:9000.
+- Console d’admin : <http://localhost:9001> (login `minioadmin` / `minioadmin`).
+- API S3-compatible : <http://localhost:9000>.
 - Le bucket `patient-documents` est créé automatiquement par `initBucket()` au démarrage de l’API (sinon créez-le via la console MinIO).
 
 ### 3. Démarrer l’API
@@ -187,7 +194,7 @@ Endpoint : `POST /api/v1/patients/{patientId}/documents`
 - Validation : `uploadMiddleware` filtre les types et limite la taille à 20 Mo.
 - Persistance : le fichier est stocké dans MinIO (`{patientId}/{uuid}-{nom}`) et les métadonnées sont enregistrées via `PatientDocumentRepository`.
 
-**Exemple (tests/apis.rest)**
+### Exemple (tests/apis.rest)
 
 ```http
 POST http://localhost:3000/api/v1/patients/{{patientId}}/documents
