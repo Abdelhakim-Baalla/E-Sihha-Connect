@@ -264,6 +264,42 @@ router.get(
 
 /**
  * @swagger
+ * /api/v1/laborders/{id}/report-link/lab:
+ *   get:
+ *     summary: Générer un lien de téléchargement temporaire pour un responsable de laboratoire
+ *     description: Permet au responsable de laboratoire authentifié de télécharger le rapport PDF pour préparer ou vérifier les résultats.
+ *     tags: [LabOrders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lien généré avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LabReportLink'
+ *       401:
+ *         description: Utilisateur non authentifié
+ *       403:
+ *         description: Accès refusé (rôle inadéquat)
+ *       404:
+ *         description: Ordre non trouvé
+ */
+router.get(
+  "/:id/report-link/lab",
+  verifyToken,
+  isLabResponsable,
+  labOrderController.getLabOrderDownloadLinkForLabResponsable
+);
+
+/**
+ * @swagger
  * /api/v1/laborders/{id}/report:
  *   get:
  *     summary: Télécharger le rapport PDF d'un ordre de laboratoire

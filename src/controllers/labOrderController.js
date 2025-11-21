@@ -269,6 +269,42 @@ exports.getLabOrderDownloadLinkForPatient = async (req, res) => {
   }
 };
 
+exports.getLabOrderDownloadLinkForLabResponsable = async (req, res) => {
+  try {
+    if (!req.utilisateur || !req.utilisateur.id)
+      return res.status(401).json({ error: "Utilisateur non authentifié" });
+    if (!linkSecret)
+      return res
+        .status(500)
+        .json({ error: "Configuration manquante pour la génération du lien" });
+
+    const order = await LabOrderRepository.findById(req.params.id);
+    if (!order) return res.status(404).json({ error: "Ordre non trouvé" });
+
+    const expiresInMinutes = linkTtlMinutes;
+    const token = jwt.sign(
+      {
+        orderId: order._id.toString(),
+        subjectId: req.utilisateur.id,
+        subjectType: "lab",
+      },
+      linkSecret,
+      { expiresIn: `${expiresInMinutes}m` }
+    );
+
+    const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000);
+
+    res.json({
+      url: buildDownloadUrl(req, order._id, token),
+      expiresAt: expiresAt.toISOString(),
+      ttlMinutes: expiresInMinutes,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 exports.downloadLabOrderReport = async (req, res) => {
   const { token } = req.query;
   if (!token) return res.status(400).json({ error: "Token requis" });
@@ -304,8 +340,13 @@ exports.downloadLabOrderReport = async (req, res) => {
     const isAuthorizedPatient =
       payload.subjectType === "patient" &&
       patientFromOrder === payload.subjectId;
+    const isAuthorizedLabResponsable = payload.subjectType === "lab";
 
-    if (!isAuthorizedDoctor && !isAuthorizedPatient)
+    if (
+      !isAuthorizedDoctor &&
+      !isAuthorizedPatient &&
+      !isAuthorizedLabResponsable
+    )
       return res.status(403).json({ error: "Token invalide" });
 
     const pdfBuffer = await generateLabOrderPdf(order);
