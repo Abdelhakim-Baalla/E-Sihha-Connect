@@ -7,7 +7,9 @@ const rendezVousRoutes = require("./routes/rendezVousRoutes");
 const availabilityRoutes = require("./routes/availabilityRoutes");
 const consultationRoutes = require("./routes/consultationRoutes");
 const labOrderRoutes = require("./routes/labOrderRoutes");
+const patientDocumentRoutes = require("./routes/patientDocumentRoutes");
 const connectDB = require("./config/db");
+const { initBucket } = require("./config/minio");
 const { seedRoles } = require("./seeders/roleSeeder");
 const { seedUtilisateurs } = require("./seeders/utilisateurSeeder");
 require("./models/Allergie");
@@ -17,6 +19,7 @@ require("./models/Patient");
 require("./models/RendezVous");
 require("./models/Consultation");
 require("./models/LabOrder");
+require("./models/PatientDocument");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
 
@@ -32,6 +35,8 @@ app.use("/api/v1/rendezvous", bookRendezVousRoutes);
 app.use("/api/v1/availability", availabilityRoutes);
 app.use("/api/v1/consultations", consultationRoutes);
 app.use("/api/v1/laborders", labOrderRoutes);
+app.use("/api/v1/patients", patientDocumentRoutes);
+app.use("/api/v1", patientDocumentRoutes);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -43,6 +48,7 @@ const PORT = process.env.PORT || 3000;
 
 async function start() {
   await connectDB();
+  await initBucket();
   await seedRoles();
   await seedUtilisateurs();
 

@@ -306,3 +306,43 @@ Authorization: Bearer {{doctorToken}}
 ### Télécharger le rapport PDF via le lien temporaire
 # Remplacer {{labReportToken}} par la valeur retournée dans la réponse précédente.
 GET http://localhost:3000/api/v1/laborders/{{labOrderId}}/report?token={{labReportToken}}
+
+### --- Documents Patients ---
+
+@documentId = 
+
+### Upload un document pour un patient (médecin)
+POST http://localhost:3000/api/v1/patients/{{patientId}}/documents
+Authorization: Bearer {{doctorToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="rapport.pdf"
+Content-Type: application/pdf
+
+< ./test-files/rapport.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="nom"
+
+Rapport médical
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="description"
+
+Rapport de consultation du 15/01/2025
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="type"
+
+rapport
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Récupérer les documents d'un patient
+GET http://localhost:3000/api/v1/patients/{{patientId}}/documents
+Authorization: Bearer {{doctorToken}}
+
+### Télécharger un document
+GET http://localhost:3000/api/v1/documents/{{documentId}}/download
+Authorization: Bearer {{doctorToken}}
+
+### Supprimer un document
+DELETE http://localhost:3000/api/v1/documents/{{documentId}}
+Authorization: Bearer {{doctorToken}}

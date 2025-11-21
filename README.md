@@ -143,6 +143,79 @@ PORT=3000
 
 ---
 
+## Stockage des documents patients (MinIO)
+
+Cette fonctionnalité est utilisée lorsque les médecins uploadent des images ou des rapports (PDF, JPEG, PNG ≤ 20 Mo) pour les dossiers patients.
+
+### 1. Variables d’environnement à ajouter
+
+Ajoutez les variables suivantes à votre `.env` (elles correspondent aux valeurs par défaut du `docker-compose.yml`).
+
+```env
+MINIO_ENDPOINT=localhost
+MINIO_PORT=9000
+MINIO_USE_SSL=false
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+MINIO_BUCKET=patient-documents
+```
+
+### 2. Démarrer MinIO en local
+
+```powershell
+docker compose up -d minio
+```
+
+- Console d’admin : http://localhost:9001 (login `minioadmin` / `minioadmin`).
+- API S3-compatible : http://localhost:9000.
+- Le bucket `patient-documents` est créé automatiquement par `initBucket()` au démarrage de l’API (sinon créez-le via la console MinIO).
+
+### 3. Démarrer l’API
+
+```powershell
+npm start
+```
+
+L’API se connecte à MinIO via `src/config/minio.js` et initialise le bucket avant de monter les routes.
+
+### 4. Upload d’un document (user story ESC-84)
+
+Endpoint : `POST /api/v1/patients/{patientId}/documents`
+
+- Authentification : JWT d’un médecin (`verifyToken` + `isDoctor`).
+- Corps : `multipart/form-data` avec le champ `file` (PDF/JPEG/PNG ≤ 20 Mo) et, optionnellement, `nom`, `description`, `type` (`image`, `rapport`, `autre`).
+- Validation : `uploadMiddleware` filtre les types et limite la taille à 20 Mo.
+- Persistance : le fichier est stocké dans MinIO (`{patientId}/{uuid}-{nom}`) et les métadonnées sont enregistrées via `PatientDocumentRepository`.
+
+**Exemple (tests/apis.rest)**
+
+```http
+POST http://localhost:3000/api/v1/patients/{{patientId}}/documents
+Authorization: Bearer {{doctorToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="rapport.pdf"
+Content-Type: application/pdf
+
+< ./test-files/rapport.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="type"
+
+rapport
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+```
+
+### 5. Routines de vérification
+
+- **Lister** : `GET /api/v1/patients/{patientId}/documents`.
+- **Télécharger** : `GET /api/v1/documents/{documentId}/download`.
+- **Supprimer** : `DELETE /api/v1/documents/{documentId}` (uniquement par le médecin qui a uploadé le fichier).
+
+Ces routes sont déjà couvertes dans `tests/apis.rest`. Pour des tests automatisés, complétez `tests/patientDocument.test.js` ou ajoutez des tests d’intégration avec Supertest.
+
+---
+
 ## Documentation API
 
 - Swagger disponible sur : `http://localhost:3000/api-docs`
