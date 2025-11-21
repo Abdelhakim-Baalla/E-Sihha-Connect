@@ -45,6 +45,7 @@ app.get("/", (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+let serverInstance = null;
 
 async function start() {
   await connectDB();
@@ -52,12 +53,29 @@ async function start() {
   await seedRoles();
   await seedUtilisateurs();
 
-  app.listen(PORT, () =>
+  serverInstance = app.listen(PORT, () =>
     console.log(`Le serveur fonctionne sur le port ${PORT}`)
   );
+
+  return serverInstance;
 }
 
-start().catch((err) => {
+const startPromise = start().catch((err) => {
   console.error("Erreur au démarrage de l'application:", err);
   process.exit(1);
 });
+
+app.ready = startPromise;
+app.close = () =>
+  new Promise((resolve, reject) => {
+    if (!serverInstance) return resolve();
+    serverInstance.close((err) => {
+      if (err && err.code !== "ERR_SERVER_NOT_RUNNING") {
+        return reject(err);
+      }
+      serverInstance = null;
+      resolve();
+    });
+  });
+
+module.exports = app;
