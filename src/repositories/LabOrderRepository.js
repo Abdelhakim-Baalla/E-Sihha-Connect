@@ -23,6 +23,14 @@ class LabOrderRepository {
       statut: { $in: statuses },
     }).sort({ createdAt: -1 });
   }
+
+  async updateResults(id, tests, statut) {
+    return await LabOrder.findByIdAndUpdate(
+      id,
+      { tests, statut, updatedAt: new Date() },
+      { new: true }
+    );
+  }
 }
 
 module.exports = new LabOrderRepository();

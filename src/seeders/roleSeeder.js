@@ -2,7 +2,15 @@ const Role = require("../models/Role");
 
 async function seedRoles() {
   try {
-    const rolesToEnsure = ["superadmin", "admin", "patient", "medecin", "infirmier", "secretaire"];
+    const rolesToEnsure = [
+      "superadmin",
+      "admin",
+      "patient",
+      "medecin",
+      "infirmier",
+      "secretaire",
+      "responsable-labo",
+    ];
 
     for (const nom of rolesToEnsure) {
       const existing = await Role.findOne({ nom });

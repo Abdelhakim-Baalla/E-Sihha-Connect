@@ -24,6 +24,21 @@ const createSchema = Joi.object({
   tests: Joi.array().items(testSchema).min(1).required(),
 });
 
+const resultEntrySchema = Joi.object({
+  code: Joi.string().optional(),
+  nom: Joi.string().required(),
+  instructions: Joi.string().optional(),
+  resultatValeur: Joi.number().required(),
+  resultatUnite: Joi.string().optional(),
+  referenceMin: Joi.number().optional(),
+  referenceMax: Joi.number().optional(),
+});
+
+const uploadResultSchema = Joi.object({
+  tests: Joi.array().items(resultEntrySchema).min(1).required(),
+  statut: Joi.string().valid("received", "completed").optional(),
+});
+
 const parsePositiveInteger = (value, fallback) => {
   const parsed = parseInt(value, 10);
   if (Number.isFinite(parsed) && parsed > 0) return parsed;
@@ -81,32 +96,44 @@ exports.getByPatient = async (req, res) => {
   }
 };
 
-const ensureLabResponsableAccess = (req, res, next) => {
-  if (!req.utilisateur || !req.utilisateur.role)
-    return res.status(401).json({ error: "Utilisateur non authentifié" });
-
-  const roleName = req.utilisateur.roleName;
-  if (roleName && roleName === "responsable-labo") return next();
-
-  if (req.utilisateur.roles && Array.isArray(req.utilisateur.roles)) {
-    const hasRole = req.utilisateur.roles.some(
-      (r) => r.nom === "responsable-labo"
-    );
-    if (hasRole) return next();
-  }
-
-  return res
-    .status(403)
-    .json({ error: "Accès réservé au responsable de laboratoire" });
-};
-
-exports.ensureLabResponsableAccess = ensureLabResponsableAccess;
-
 exports.getById = async (req, res) => {
   try {
     const order = await LabOrderRepository.findById(req.params.id);
     if (!order) return res.status(404).json({ error: "Ordre non trouvé" });
     res.json(decorateOrderWithFlags(order));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.updateLabResults = async (req, res) => {
+  const { error } = uploadResultSchema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+
+  try {
+    const order = await LabOrderRepository.findById(req.params.id);
+    if (!order) return res.status(404).json({ error: "Ordre non trouvé" });
+    if (order.statut === "cancelled") {
+      return res
+        .status(400)
+        .json({ error: "Impossible de mettre à jour un ordre annulé" });
+    }
+
+    const requestedStatus = req.body.statut || "received";
+    if (requestedStatus === "completed" && order.statut !== "received") {
+      return res.status(400).json({
+        error:
+          "Le statut doit être 'received' avant de pouvoir passer à 'completed'",
+      });
+    }
+
+    const updatedOrder = await LabOrderRepository.updateResults(
+      req.params.id,
+      req.body.tests,
+      requestedStatus
+    );
+
+    res.json(decorateOrderWithFlags(updatedOrder));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -134,7 +161,7 @@ exports.getMyResults = async (req, res) => {
 
     const completedOrders = await LabOrderRepository.findByPatientAndStatus(
       patient._id,
-      ["completed"]
+      ["received", "completed"]
     );
 
     res.json(decorateOrdersWithFlags(completedOrders));

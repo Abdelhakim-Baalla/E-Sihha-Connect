@@ -61,9 +61,9 @@ Dans le monde rapide des soins de santé, les cliniques ont besoin d'outils fiab
 - **Résultats de Laboratoire** :
   - Création et suivi des ordres labo par les médecins.
   - Visualisation côté patient de tous ses ordres.
-  - Endpoint dédié pour consulter uniquement ses résultats complétés (statut "completed").
+  - Workflow complet jusqu'au labo : le rôle `responsable-labo` consulte les ordres, saisit les résultats et fait évoluer les statuts (`ordered → received → completed`) via `PUT /api/v1/laborders/{id}/results`.
+  - Les patients disposent d'un endpoint dédié pour suivre leurs résultats reçus/completés.
   - Téléchargement sécurisé des rapports PDF via liens temporaires (médecin ou patient).
-  - Consultation détaillée des ordres par le responsable de laboratoire (tests, patient, statut).
 - **Sécurité & Meilleures Pratiques** :
   - Validation des entrées avec Joi.
   - Gestion centralisée des erreurs et logging (Winston).

@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const labOrderController = require("../controllers/labOrderController");
-const { verifyToken, isDoctor } = require("../middlewares/authMiddleware");
 const {
-  ensureLabResponsableAccess,
-} = require("../controllers/labOrderController");
+  verifyToken,
+  isDoctor,
+  isLabResponsable,
+} = require("../middlewares/authMiddleware");
 
 /**
  * @swagger
@@ -67,7 +68,7 @@ const {
  *             $ref: '#/components/schemas/LabOrderTest'
  *         statut:
  *           type: string
- *           enum: [ordered, completed, cancelled]
+ *           enum: [ordered, received, completed, cancelled]
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -365,11 +366,61 @@ router.get("/me/results", verifyToken, labOrderController.getMyResults);
  *       404:
  *         description: Ordre non trouvé
  */
-router.get(
-  "/:id",
+/**
+ * @swagger
+ * /api/v1/laborders/{id}/results:
+ *   put:
+ *     summary: Mettre à jour les résultats d'un ordre de laboratoire reçu
+ *     description: Accessible uniquement au responsable de laboratoire afin d'ajouter les valeurs mesurées et de faire évoluer le statut de l'ordre de "ordered" vers "received" puis "completed".
+ *     tags: [LabOrders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Identifiant de l'ordre de laboratoire
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               statut:
+ *                 type: string
+ *                 enum: [received, completed]
+ *                 description: Statut souhaité après mise à jour. Par défaut "received".
+ *               tests:
+ *                 type: array
+ *                 items:
+ *                   $ref: '#/components/schemas/LabOrderTest'
+ *                 description: Liste des tests avec leurs résultats saisis par le laboratoire.
+ *     responses:
+ *       200:
+ *         description: Ordre mis à jour avec les résultats fournis
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LabOrder'
+ *       400:
+ *         description: Données invalides ou transition de statut interdite
+ *       401:
+ *         description: Non authentifié
+ *       403:
+ *         description: Accès refusé
+ *       404:
+ *         description: Ordre non trouvé
+ */
+router.put(
+  "/:id/results",
   verifyToken,
-  ensureLabResponsableAccess,
-  labOrderController.getById
+  isLabResponsable,
+  labOrderController.updateLabResults
 );
+
+router.get("/:id", verifyToken, isLabResponsable, labOrderController.getById);
 
 module.exports = router;

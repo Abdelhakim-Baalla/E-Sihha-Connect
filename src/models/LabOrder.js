@@ -28,7 +28,7 @@ const labOrderSchema = new mongoose.Schema({
   tests: { type: [testSchema], default: [] },
   statut: {
     type: String,
-    enum: ["ordered", "completed", "cancelled"],
+    enum: ["ordered", "received", "completed", "cancelled"],
     default: "ordered",
   },
   createdAt: { type: Date, default: Date.now },

@@ -21,6 +21,26 @@ exports.isDoctor = async (req, res, next) => {
   }
 };
 
+exports.isLabResponsable = async (req, res, next) => {
+  try {
+    if (!req.utilisateur || !req.utilisateur.role) {
+      return res.status(403).json("Accès refusé : rôle manquant");
+    }
+    const role = await Role.findById(req.utilisateur.role);
+    if (!role || role.nom !== "responsable-labo") {
+      return res
+        .status(403)
+        .json("Accès refusé : réservé aux responsables de laboratoire");
+    }
+    next();
+  } catch (err) {
+    res
+      .status(500)
+      .json(
+        "Erreur serveur lors de la vérification du rôle responsable de laboratoire"
+      );
+  }
+};
 
 exports.isAdmin = async (req, res, next) => {
   try {
