@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const labOrderController = require("../controllers/labOrderController");
 const { verifyToken, isDoctor } = require("../middlewares/authMiddleware");
+const {
+  ensureLabResponsableAccess,
+} = require("../controllers/labOrderController");
 
 /**
  * @swagger
@@ -362,6 +365,11 @@ router.get("/me/results", verifyToken, labOrderController.getMyResults);
  *       404:
  *         description: Ordre non trouvé
  */
-router.get("/:id", verifyToken, labOrderController.getById);
+router.get(
+  "/:id",
+  verifyToken,
+  ensureLabResponsableAccess,
+  labOrderController.getById
+);
 
 module.exports = router;

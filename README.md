@@ -63,6 +63,7 @@ Dans le monde rapide des soins de santé, les cliniques ont besoin d'outils fiab
   - Visualisation côté patient de tous ses ordres.
   - Endpoint dédié pour consulter uniquement ses résultats complétés (statut "completed").
   - Téléchargement sécurisé des rapports PDF via liens temporaires (médecin ou patient).
+  - Consultation détaillée des ordres par le responsable de laboratoire (tests, patient, statut).
 - **Sécurité & Meilleures Pratiques** :
   - Validation des entrées avec Joi.
   - Gestion centralisée des erreurs et logging (Winston).

@@ -81,6 +81,27 @@ exports.getByPatient = async (req, res) => {
   }
 };
 
+const ensureLabResponsableAccess = (req, res, next) => {
+  if (!req.utilisateur || !req.utilisateur.role)
+    return res.status(401).json({ error: "Utilisateur non authentifié" });
+
+  const roleName = req.utilisateur.roleName;
+  if (roleName && roleName === "responsable-labo") return next();
+
+  if (req.utilisateur.roles && Array.isArray(req.utilisateur.roles)) {
+    const hasRole = req.utilisateur.roles.some(
+      (r) => r.nom === "responsable-labo"
+    );
+    if (hasRole) return next();
+  }
+
+  return res
+    .status(403)
+    .json({ error: "Accès réservé au responsable de laboratoire" });
+};
+
+exports.ensureLabResponsableAccess = ensureLabResponsableAccess;
+
 exports.getById = async (req, res) => {
   try {
     const order = await LabOrderRepository.findById(req.params.id);
