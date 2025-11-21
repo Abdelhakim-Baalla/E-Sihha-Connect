@@ -62,6 +62,7 @@ Dans le monde rapide des soins de santé, les cliniques ont besoin d'outils fiab
   - Création et suivi des ordres labo par les médecins.
   - Visualisation côté patient de tous ses ordres.
   - Endpoint dédié pour consulter uniquement ses résultats complétés (statut "completed").
+  - Téléchargement sécurisé des rapports PDF via liens temporaires (médecin ou patient).
 - **Sécurité & Meilleures Pratiques** :
   - Validation des entrées avec Joi.
   - Gestion centralisée des erreurs et logging (Winston).

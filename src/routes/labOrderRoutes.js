@@ -225,6 +225,41 @@ router.get(
 
 /**
  * @swagger
+ * /api/v1/laborders/{id}/report-link/patient:
+ *   get:
+ *     summary: Générer un lien de téléchargement temporaire pour un patient
+ *     description: Permet à un patient authentifié de récupérer un lien pour télécharger le rapport PDF de son propre ordre de laboratoire.
+ *     tags: [LabOrders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lien généré avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LabReportLink'
+ *       401:
+ *         description: Utilisateur non authentifié
+ *       403:
+ *         description: Accès refusé (ordre ne correspondant pas au patient)
+ *       404:
+ *         description: Ordre non trouvé
+ */
+router.get(
+  "/:id/report-link/patient",
+  verifyToken,
+  labOrderController.getLabOrderDownloadLinkForPatient
+);
+
+/**
+ * @swagger
  * /api/v1/laborders/{id}/report:
  *   get:
  *     summary: Télécharger le rapport PDF d'un ordre de laboratoire
