@@ -6,7 +6,7 @@ const patientDocumentSchema = new mongoose.Schema({
     ref: "Patient",
     required: true,
   },
-  medecin: {
+  uploadedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Utilisateur",
     required: true,

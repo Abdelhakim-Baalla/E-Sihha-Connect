@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Cette fonctionnalité permet aux médecins d'uploader des images et rapports pour les dossiers patients. Les fichiers sont stockés dans MinIO (stockage d'objets compatible S3).
+Cette fonctionnalité permet aux patients (pour leurs propres dossiers) et aux médecins (pour leurs patients) d'uploader des images et rapports. Les fichiers sont stockés dans MinIO (stockage d'objets compatible S3).
 
 ## Fonctionnalités
 
@@ -10,7 +10,7 @@ Cette fonctionnalité permet aux médecins d'uploader des images et rapports pou
 - ✅ Validation de taille (max 20MB)
 - ✅ Stockage sécurisé dans MinIO
 - ✅ Téléchargement de documents
-- ✅ Suppression par le médecin créateur
+- ✅ Suppression par le patient concerné ou le professionnel qui a importé le document
 - ✅ Liste des documents par patient
 
 ## Configuration
@@ -39,8 +39,9 @@ docker-compose up -d
 ```
 
 MinIO sera accessible sur :
-- API: http://localhost:9000
-- Console: http://localhost:9001
+
+- API: <http://localhost:9000>
+- Console: <http://localhost:9001>
 
 ## Endpoints API
 
@@ -48,7 +49,7 @@ MinIO sera accessible sur :
 
 ```http
 POST /api/v1/patients/{patientId}/documents
-Authorization: Bearer {doctorToken}
+Authorization: Bearer {patientToken | doctorToken}
 Content-Type: multipart/form-data
 
 file: [fichier binaire]
@@ -75,14 +76,14 @@ Authorization: Bearer {token}
 
 ```http
 DELETE /api/v1/documents/{documentId}
-Authorization: Bearer {doctorToken}
+Authorization: Bearer {patientToken | doctorUploaderToken}
 ```
 
 ## Validation
 
 - **Types autorisés**: PDF, JPEG, PNG
 - **Taille maximale**: 20MB
-- **Authentification**: Médecin uniquement pour upload/suppression
+- **Authentification**: Patients (pour leur propre dossier) ou médecins (pour les patients qu'ils suivent)
 
 ## Structure de données
 
@@ -90,7 +91,7 @@ Authorization: Bearer {doctorToken}
 {
   "_id": "...",
   "patient": "patientId",
-  "medecin": { "nom": "...", "prenom": "..." },
+  "uploadedBy": { "nom": "...", "prenom": "..." },
   "nom": "rapport.pdf",
   "description": "...",
   "type": "rapport",
@@ -103,7 +104,7 @@ Authorization: Bearer {doctorToken}
 
 ## Sécurité
 
-- Seuls les médecins authentifiés peuvent uploader
-- Seul le médecin créateur peut supprimer
+- Seuls les patients authentifiés (pour leur propre dossier) ou les médecins peuvent uploader
+- Suppression autorisée pour le patient concerné ou le professionnel ayant importé le document
 - Validation stricte des types MIME
 - Stockage isolé par patient dans MinIO

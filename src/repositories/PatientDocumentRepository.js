@@ -14,14 +14,14 @@ class PatientDocumentRepository {
     }
 
     return await PatientDocument.find(query)
-      .populate("medecin", "nom prenom")
+      .populate("uploadedBy", "nom prenom")
       .sort({ createdAt: -1 });
   }
 
   async findById(id) {
     return await PatientDocument.findById(id)
-      .populate("patient", "nom prenom")
-      .populate("medecin", "nom prenom");
+      .populate("patient", "nom prenom utilisateur")
+      .populate("uploadedBy", "nom prenom");
   }
 
   async deleteById(id) {

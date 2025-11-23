@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const patientDocumentController = require("../controllers/patientDocumentController");
-const { verifyToken, isDoctor } = require("../middlewares/authMiddleware");
+const { verifyToken } = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/uploadMiddleware");
 
 /**
@@ -15,7 +15,7 @@ const upload = require("../middlewares/uploadMiddleware");
  * @swagger
  * /api/v1/patients/{patientId}/documents:
  *   post:
- *     summary: Upload un document pour un patient
+ *     summary: Upload un document pour un patient (patient ou médecin)
  *     tags: [PatientDocuments]
  *     security:
  *       - bearerAuth: []
@@ -48,12 +48,11 @@ const upload = require("../middlewares/uploadMiddleware");
  *       201:
  *         description: Document uploadé
  *       400:
- *         description: Fichier invalide
+ *         description: Fichier invalide ou non autorisé
  */
 router.post(
   "/:patientId/documents",
   verifyToken,
-  isDoctor,
   upload.single("file"),
   patientDocumentController.uploadDocument
 );
@@ -117,7 +116,7 @@ router.get(
  * @swagger
  * /api/v1/documents/{id}:
  *   delete:
- *     summary: Supprimer un document
+ *     summary: Supprimer un document (patient ou médecin uploader)
  *     tags: [PatientDocuments]
  *     security:
  *       - bearerAuth: []
@@ -134,7 +133,6 @@ router.get(
 router.delete(
   "/documents/:id",
   verifyToken,
-  isDoctor,
   patientDocumentController.deleteDocument
 );
 
