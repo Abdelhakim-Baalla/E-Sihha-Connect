@@ -1,5 +1,6 @@
 const bookRendezVousRoutes = require("./routes/bookRendezVousRoutes");
 const express = require("express");
+const cors = require("cors");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/authRoutes");
 const patientRoutes = require("./routes/patientRoutes");
@@ -27,6 +28,7 @@ const swaggerSpec = require("./config/swagger");
 dotenv.config();
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/v1/", authRoutes);
