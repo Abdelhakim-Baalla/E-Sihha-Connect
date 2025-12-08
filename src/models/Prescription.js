@@ -21,6 +21,10 @@ const prescriptionSchema = new mongoose.Schema(
       ref: "Utilisateur",
       required: true,
     },
+    pharmacien: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Utilisateur",
+    },
     consultation: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Consultation",

@@ -26,6 +26,13 @@ class PrescriptionRepository {
     }).sort({ createdAt: -1 });
   }
 
+  async findByPharmacist(pharmacistId) {
+    return await Prescription.find({ pharmacien: pharmacistId })
+      .populate("patient", "nom prenom")
+      .populate("medecin", "nom prenom")
+      .sort({ createdAt: -1 });
+  }
+
   async updateStatus(id, statut) {
     return await Prescription.findByIdAndUpdate(
       id,

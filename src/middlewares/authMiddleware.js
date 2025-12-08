@@ -42,6 +42,23 @@ exports.isLabResponsable = async (req, res, next) => {
   }
 };
 
+exports.isPharmacist = async (req, res, next) => {
+  try {
+    if (!req.utilisateur || !req.utilisateur.role) {
+      return res.status(403).json("Accès refusé : rôle manquant");
+    }
+    const role = await Role.findById(req.utilisateur.role);
+    if (!role || role.nom !== "pharmacien") {
+      return res.status(403).json("Accès refusé : réservé aux pharmaciens");
+    }
+    next();
+  } catch (err) {
+    res
+      .status(500)
+      .json("Erreur serveur lors de la vérification du rôle pharmacien");
+  }
+};
+
 exports.isAdmin = async (req, res, next) => {
   try {
     if (!req.utilisateur || !req.utilisateur.role) {

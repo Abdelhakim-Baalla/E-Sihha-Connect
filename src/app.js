@@ -8,6 +8,7 @@ const availabilityRoutes = require("./routes/availabilityRoutes");
 const consultationRoutes = require("./routes/consultationRoutes");
 const labOrderRoutes = require("./routes/labOrderRoutes");
 const patientDocumentRoutes = require("./routes/patientDocumentRoutes");
+const prescriptionRoutes = require("./routes/prescriptionRoutes");
 const connectDB = require("./config/db");
 const { initBucket } = require("./config/minio");
 const { seedRoles } = require("./seeders/roleSeeder");
@@ -36,6 +37,7 @@ app.use("/api/v1/availability", availabilityRoutes);
 app.use("/api/v1/consultations", consultationRoutes);
 app.use("/api/v1/laborders", labOrderRoutes);
 app.use("/api/v1/patients", patientDocumentRoutes);
+app.use("/api/v1/prescriptions", prescriptionRoutes);
 app.use("/api/v1", patientDocumentRoutes);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

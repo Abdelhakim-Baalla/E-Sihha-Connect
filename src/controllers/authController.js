@@ -218,7 +218,18 @@ exports.connexion = async (req, res) => {
   utilisateur.accessToken = jetonAcces;
   await utilisateur.save();
 
-  res.json({ jetonAcces, jetonRafraichissement });
+  res.json({
+    jetonAcces,
+    jetonRafraichissement,
+    utilisateur: {
+      _id: utilisateur._id,
+      nom: utilisateur.nom,
+      prenom: utilisateur.prenom,
+      email: utilisateur.email,
+      role: utilisateur.role,
+      patient: utilisateur.patient,
+    },
+  });
 };
 
 exports.forgetPassword = async (req, res) => {

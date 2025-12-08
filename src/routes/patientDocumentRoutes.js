@@ -78,6 +78,27 @@ router.post(
  *           type: string
  *           enum: [image, rapport, autre]
  *         description: Filtrer les documents par type
+ *       - in: query
+ *         name: date
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filtrer par date spécifique (YYYY-MM-DD)
+ *       - in: query
+ *         name: startDate
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Date de début (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Date de fin (YYYY-MM-DD)
  *     responses:
  *       200:
  *         description: Liste des documents

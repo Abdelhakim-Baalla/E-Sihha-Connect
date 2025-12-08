@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const prescriptionController = require("../controllers/prescriptionController");
-const { verifyToken, isDoctor } = require("../middlewares/authMiddleware");
+const { verifyToken, isDoctor, isPharmacist } = require("../middlewares/authMiddleware");
 
 router.post(
   "/",
@@ -21,8 +21,21 @@ router.get("/:id", verifyToken, prescriptionController.getById);
 router.patch(
   "/:id/statut",
   verifyToken,
-  isDoctor,
   prescriptionController.updateStatus
+);
+
+router.get(
+  "/assigned",
+  verifyToken,
+  isPharmacist,
+  prescriptionController.getAssignedPrescriptions
+);
+
+router.put(
+  "/:id/assign",
+  verifyToken,
+  isDoctor,
+  prescriptionController.assignPharmacist
 );
 
 module.exports = router;

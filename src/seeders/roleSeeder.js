@@ -10,6 +10,7 @@ async function seedRoles() {
       "infirmier",
       "secretaire",
       "responsable-labo",
+      "pharmacien",
     ];
 
     for (const nom of rolesToEnsure) {

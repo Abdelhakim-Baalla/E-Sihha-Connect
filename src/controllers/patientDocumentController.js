@@ -83,7 +83,7 @@ exports.uploadDocument = async (req, res) => {
 
 exports.getPatientDocuments = async (req, res) => {
   try {
-    const { type } = req.query;
+    const { type, date, startDate, endDate } = req.query;
     const allowedTypes = ["image", "rapport", "autre"];
 
     if (type && !allowedTypes.includes(type)) {
@@ -107,7 +107,7 @@ exports.getPatientDocuments = async (req, res) => {
 
     const documents = await PatientDocumentRepository.findByPatient(
       req.params.patientId,
-      { type }
+      { type, date, startDate, endDate }
     );
     res.json(documents);
   } catch (err) {

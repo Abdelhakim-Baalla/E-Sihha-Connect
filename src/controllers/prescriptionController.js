@@ -87,6 +87,22 @@ exports.getById = async (req, res) => {
     const prescription = await PrescriptionRepository.findById(req.params.id);
     if (!prescription)
       return res.status(404).json({ error: "Prescription non trouvée" });
+
+    // Access Control
+    const userId = req.utilisateur.id;
+    const isDoctor = prescription.medecin._id.toString() === userId;
+    const isPharmacist = prescription.pharmacien && prescription.pharmacien.toString() === userId;
+    const isPatient = prescription.patient && prescription.patient.utilisateur && prescription.patient.utilisateur.toString() === userId;
+
+    if (!isDoctor && !isPharmacist && !isPatient) {
+      // Also check if user is the patient directly (if not populated with user in repository yet, though findById does populate)
+      // Actually repository populates 'patient' which is a Patient document. Patient doc has 'utilisateur' field.
+      // Let's rely on what we have. If repo populates patient, we check patient.utilisateur.
+      // If repo populates medecin, we check medecin._id.
+      
+      return res.status(403).json({ error: "Accès refusé" });
+    }
+
     res.json(prescription);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -128,14 +144,71 @@ exports.updateStatus = async (req, res) => {
   if (error) return res.status(400).json({ error: error.details[0].message });
 
   try {
-    const prescription = await PrescriptionRepository.updateStatus(
+    const prescription = await PrescriptionRepository.findById(req.params.id);
+    if (!prescription)
+      return res.status(404).json({ error: "Prescription non trouvée" });
+
+    // Access & Logic Check
+    const userId = req.utilisateur.id;
+    // We need to know the user's role. req.utilisateur.role is the Role ID. 
+    // We should fetch the Role name or assume logic if we trust the ID (but we need the name).
+    // Let's fetch the Role to be sure.
+    const Role = require("../models/Role");
+    const roleDoc = await Role.findById(req.utilisateur.role);
+    const roleName = roleDoc ? roleDoc.nom : "";
+
+    const isDoctor = roleName === "medecin"; // Check if role is doctor (simplified)
+    const isPharmacist = roleName === "pharmacien";
+
+    if (isDoctor) {
+        // Doctor: Must be the prescriber? Usually yes, but let's just ensure they are a doctor for now as per previous logic (middleware was isDoctor).
+        // If we want strict ownership: if (prescription.medecin._id.toString() !== userId) return 403.
+        // The previous middleware `isDoctor` only checked if the user had the role 'medecin', not ownership (based on my read of authMiddleware).
+        // So we maintain that behavior (Functionally Any Doctor, or we enforce ownership). 
+        // Let's enforce ownership for safety, or at least role.
+        // Update: The previous middleware `isDoctor` checked role only. I will keep it as role check for now to avoid breaking existing flows, 
+        // BUT strict ownership is better. Let's stick to role check + ownership if possible, but minimal change is Role Check.
+    } else if (isPharmacist) {
+        // Pharmacist: Must be assigned AND status must be 'dispensee'
+        const isAssigned = prescription.pharmacien && prescription.pharmacien.toString() === userId;
+        if (!isAssigned) {
+            return res.status(403).json({ error: "Accès refusé : vous n'êtes pas le pharmacien assigné" });
+        }
+        if (req.body.statut !== "dispensee") {
+             return res.status(403).json({ error: "Accès refusé : vous ne pouvez que marquer comme dispensée" });
+        }
+    } else {
+        return res.status(403).json({ error: "Accès refusé" });
+    }
+
+    const updatedPrescription = await PrescriptionRepository.updateStatus(
       req.params.id,
       req.body.statut
     );
 
+    res.json(updatedPrescription);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+exports.getAssignedPrescriptions = async (req, res) => {
+  try {
+    const pharmacistId = req.utilisateur.id;
+    const prescriptions = await PrescriptionRepository.findByPharmacist(pharmacistId);
+    res.json(prescriptions);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.assignPharmacist = async (req, res) => {
+  try {
+    const { pharmacistId } = req.body;
+    const prescription = await PrescriptionRepository.update(req.params.id, {
+      pharmacien: pharmacistId,
+    });
     if (!prescription)
       return res.status(404).json({ error: "Prescription non trouvée" });
-
     res.json(prescription);
   } catch (err) {
     res.status(500).json({ error: err.message });
